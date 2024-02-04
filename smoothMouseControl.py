@@ -20,13 +20,16 @@ class control:
         self.screenMonitors = screeninfo.get_monitors()
         self.screenSize = numpy.array(
             (self.screenMonitors[0].width, self.screenMonitors[0].height))
-        self.mousePosRecord = numpy.array(pyautogui.position()*self.smooth)
-        self.mousePosRecord.resize((self.smooth,2))
-        self.avgScreenSize = self.screenSize.sum()/2
+        self.setToMousePos()
+        self.avgScreenSize = self.screenSize.sum() / 2
+
+    def setToMousePos(self):
+        self.mousePosRecord = numpy.array(pyautogui.position() * self.smooth)
+        self.mousePosRecord.resize((self.smooth, 2))
 
     def speedMove(self):
         if (((self.mousePosRecord[0] - self.getPos())**2).sum()**0.5
-                >= 0.05*self.avgScreenSize):
+                >= 0.05 * self.avgScreenSize):
             for i in range(1, self.smooth):
                 self.mousePosRecord[i] = self.mousePosRecord[0]
 
@@ -43,8 +46,8 @@ class control:
 
     def pushPos(self, Pos, setPos=True):
         newPos = numpy.array(Pos)
-        newPos[0] = max(0, min(self.screenSize[0]-1, newPos[0]))
-        newPos[1] = max(0, min(self.screenSize[1]-1, newPos[1]))
+        newPos[0] = max(0, min(self.screenSize[0] - 1, newPos[0]))
+        newPos[1] = max(0, min(self.screenSize[1] - 1, newPos[1]))
         for i in range(self.smooth - 1, 0, -1):
             self.mousePosRecord[i] = self.mousePosRecord[i - 1]
         self.mousePosRecord[0] = newPos
@@ -66,3 +69,7 @@ class control:
 
     def keyUp(self, button):
         pyautogui.keyUp(button)
+
+    def scroll(self, val):
+        mouse.wheel(int(val/50))
+        # pyautogui.scroll(int(val))

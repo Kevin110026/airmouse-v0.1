@@ -28,7 +28,7 @@ def analize(landmark):
             # vectors[j] = numpy.array([curLandmark.x, curLandmark.y])
             vectors[j][0] = curLandmark.x
             vectors[j][1] = curLandmark.y
-            vectors[j][2] = curLandmark.y
+            vectors[j][2] = curLandmark.z
 
         fingersVector[i] = numpy.array(
             [vectors[0] - vectors[1], vectors[2] - vectors[1]])
@@ -47,8 +47,8 @@ def analize(landmark):
         else:
             fingersResult[i] = 0
 
-    for i in range(5):
-        fingersDegree[i]=int(fingersDegree)
-    print(fingersDegree)
+    # for i in range(5):
+    #     fingersDegree[i]=int(fingersDegree[i])
+    # print(fingersDegree)
 
     return fingersResult

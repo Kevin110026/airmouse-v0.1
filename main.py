@@ -14,8 +14,8 @@ cap = cv2.VideoCapture(0)
 mpHands = mp.solutions.hands
 hands = mpHands.Hands(model_complexity=1,
                       max_num_hands=1,
-                      min_detection_confidence=0.9,
-                      min_tracking_confidence=0.001)
+                      min_detection_confidence=0.95,
+                      min_tracking_confidence=0.01)
 mpDraw = mp.solutions.drawing_utils
 
 FPS = fps.fps()
@@ -25,20 +25,20 @@ lastHandPosition = None
 fistExitCount = 0
 lastMouseStatus = 0
 
+
 def mouseExit(curGesture):
-    if(curGesture[1]):
+    if (curGesture[1]):
         mouseControl.mouseUp(button="left")
-    if(curGesture[2]):
+    if (curGesture[2]):
         mouseControl.mouseUp(button="right")
-    if(curGesture[3]):
-        mouseControl.keyUp(button="shift")
-    if(curGesture[4]):
+    if (curGesture[4]):
         mouseControl.keyUp(button="ctrl")
-        
+
     for i in range(5):
-        curGesture[i]=0
-    
+        curGesture[i] = 0
+
     return curGesture
+
 
 while True:
     ret, img = cap.read()
@@ -63,57 +63,54 @@ while True:
 
             if (curGestureName == "fist"):
                 fistExitCount += 1
-                if(fistExitCount>=5):
+                if (fistExitCount >= 5):
                     mouseExit(curGesture=lastGesture)
                     break
             else:
-                fistExitCount=0
-                
+                fistExitCount = 0
+
                 if (curGesture[0] == 1):
                     if (type(lastHandPosition) != type(None)):
                         deltaHandPosition = handPosition - lastHandPosition
                         deltaMousePos = deltaHandPosition * mouseControlScale
-                        mouseControl.pushDis(deltaMousePos)
-                    lastHandPosition = handPosition
-                    
-                    if (curGesture[1] != lastGesture[1]):
-                        if (curGesture[1] == 1):
-                            print("leftClick")
-                            mouseControl.mouseDown(button="left")
-                        else:
-                            mouseControl.mouseUp(button="left")
-
-                    if (curGesture[2] != lastGesture[2]):
-                        if (curGesture[2] == 1):
-                            print("rightClick")
-                            mouseControl.mouseDown(button="right")
-                        else:
-                            mouseControl.mouseUp(button="right")
-
-                    if (curGesture[3] != lastGesture[3]):
                         if (curGesture[3] == 1):
-                            print("shift")
-                            mouseControl.keyDown(button="shift")
+                            mouseControl.scroll(deltaMousePos[1])
+                            pass
                         else:
-                            mouseControl.keyUp(button="shift")
-
-                    if (curGesture[4] != lastGesture[4]):
-                        if (curGesture[4] == 1):
-                            print("ctrl")
-                            mouseControl.keyDown(button="ctrl")
-                        else:
-                            mouseControl.keyUp(button="ctrl")
-                            
-                    lastGesture = curGesture
+                            mouseControl.pushDis(deltaMousePos)
+                    lastHandPosition = handPosition
                 else:
                     lastHandPosition = None
+                    mouseControl.setToMousePos()
 
+                if (curGesture[1] != lastGesture[1]):
+                    if (curGesture[1] == 1):
+                        # print("leftClick")
+                        mouseControl.mouseDown(button="left")
+                    else:
+                        mouseControl.mouseUp(button="left")
+
+                if (curGesture[2] != lastGesture[2]):
+                    if (curGesture[2] == 1):
+                        # print("rightClick")
+                        mouseControl.mouseDown(button="right")
+                    else:
+                        mouseControl.mouseUp(button="right")
+
+                if (curGesture[4] != lastGesture[4]):
+                    if (curGesture[4] == 1):
+                        # print("ctrl")
+                        mouseControl.keyDown(button="ctrl")
+                    else:
+                        mouseControl.keyUp(button="ctrl")
+
+                lastGesture = curGesture
 
             for handLms in result.multi_hand_landmarks:
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
                 # for i, lm in enumerate(handLms.landmark):
                 #     print(i, lm.x, lm.y)
-        
+
         else:
             mouseExit(curGesture=lastGesture)
 
@@ -129,6 +126,5 @@ while True:
 
     if (cv2KeyEvent == 27):
         break
-    
 
 cap.release()
