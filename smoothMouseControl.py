@@ -26,7 +26,7 @@ class control:
 
     def speedMove(self):
         if (((self.mousePosRecord[0] - self.getPos())**2).sum()**0.5
-                >= 0.01*self.avgScreenSize):
+                >= 0.05*self.avgScreenSize):
             for i in range(1, self.smooth):
                 self.mousePosRecord[i] = self.mousePosRecord[0]
 

@@ -8,7 +8,7 @@ def gesturesName(fingerResult):
     elif ((fingerResult == numpy.array([1, 1, 1, 1, 1])).all()):
         return "fist"
     elif ((fingerResult == numpy.array([1, 1, 0, 1, 1])).all()):
-        return "fuck you"
+        return "fxxk you"
     else:
         return "others"
 
@@ -19,21 +19,22 @@ def analize(landmark):
     fingerVectorDefination = numpy.array([[2, 3, 4], [5, 6, 8], [9, 10, 12],
                                           [13, 14, 16], [17, 18, 20]])
 
-    fingersVector = numpy.zeros((5, 2, 2))
+    fingersVector = numpy.zeros((5, 2, 3))
     for i in range(5):
         curDefination = fingerVectorDefination[i]
-        vectors = numpy.zeros((3, 2))
+        vectors = numpy.zeros((3, 3))
         for j in range(3):
             curLandmark = landmark[curDefination[j]]
             # vectors[j] = numpy.array([curLandmark.x, curLandmark.y])
-            vectors[j][0]=curLandmark.x
-            vectors[j][1]=curLandmark.y
+            vectors[j][0] = curLandmark.x
+            vectors[j][1] = curLandmark.y
+            vectors[j][2] = curLandmark.y
 
         fingersVector[i] = numpy.array(
             [vectors[0] - vectors[1], vectors[2] - vectors[1]])
 
     # print(fingersVector)
-    
+
     for i in range(5):
         fingersDegree[i] = tools.getDegree(fingersVector[i][0],
                                            fingersVector[i][1])
@@ -46,6 +47,8 @@ def analize(landmark):
         else:
             fingersResult[i] = 0
 
+    for i in range(5):
+        fingersDegree[i]=int(fingersDegree)
     print(fingersDegree)
 
     return fingersResult
