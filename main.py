@@ -31,8 +31,8 @@ def mouseExit(curGesture):
         mouseControl.mouseUp(button="left")
     if (curGesture[2]):
         mouseControl.mouseUp(button="right")
-    if (curGesture[4]):
-        mouseControl.keyUp(button="ctrl")
+    # if (curGesture[4]):
+    #     mouseControl.keyUp(button="ctrl")
 
     for i in range(5):
         curGesture[i] = 0
@@ -73,6 +73,8 @@ while True:
                     if (type(lastHandPosition) != type(None)):
                         deltaHandPosition = handPosition - lastHandPosition
                         deltaMousePos = deltaHandPosition * mouseControlScale
+                        if (curGesture[4] == 1):
+                            deltaMousePos *= 0.1
                         if (curGesture[3] == 1):
                             mouseControl.scroll(deltaMousePos[1])
                             pass
@@ -97,12 +99,12 @@ while True:
                     else:
                         mouseControl.mouseUp(button="right")
 
-                if (curGesture[4] != lastGesture[4]):
-                    if (curGesture[4] == 1):
-                        # print("ctrl")
-                        mouseControl.keyDown(button="ctrl")
-                    else:
-                        mouseControl.keyUp(button="ctrl")
+                # if (curGesture[4] != lastGesture[4]):
+                #     if (curGesture[4] == 1):
+                #         # print("ctrl")
+                #         mouseControl.keyDown(button="ctrl")
+                #     else:
+                #         mouseControl.keyUp(button="ctrl")
 
                 lastGesture = curGesture
 
