@@ -71,5 +71,6 @@ class control:
         pyautogui.keyUp(button)
 
     def scroll(self, val):
-        mouse.wheel(int(val / 50))
-        # pyautogui.scroll(int(val))
+        # mouse.wheel(int(val / 50))
+        pyautogui.scroll(int(val),_pause=False)
+        # pyautogui.scroll 記得要 _pause=False 不然會很卡

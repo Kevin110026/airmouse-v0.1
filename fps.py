@@ -1,9 +1,16 @@
 import time
+
+
 class fps:
+
     def __init__(self):
-        self.lastTime=time.time()
+        self.lastTime = time.time()
+
     def get(self):
-        curTime=time.time()
-        ans = 1/(curTime-self.lastTime)
-        self.lastTime=curTime
+        curTime = time.time()
+        try:
+            ans = 1 / (curTime - self.lastTime)
+        except:
+            ans = float('inf')
+        self.lastTime = curTime
         return ans
