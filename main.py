@@ -26,7 +26,7 @@ fistExitCount = 0
 lastMouseStatus = 0
 
 
-def mouseExit(curGesture):
+def mouseExit(curGesture: numpy.ndarray):
     if (curGesture[1]):
         mouseControl.mouseUp(button="left")
     if (curGesture[2]):

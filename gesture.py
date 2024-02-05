@@ -2,7 +2,7 @@ import tools
 import numpy
 
 
-def gesturesName(fingerResult):
+def gesturesName(fingerResult : numpy.ndarray) -> str:
     if ((fingerResult == numpy.array([0, 1, 0, 0, 0])).all()):
         return "leftClick"
     elif ((fingerResult == numpy.array([1, 1, 1, 1, 1])).all()):
@@ -13,7 +13,7 @@ def gesturesName(fingerResult):
         return "others"
 
 
-def analize(landmark):
+def analize(landmark: numpy.ndarray) -> numpy.ndarray:
     fingersDegree = numpy.zeros(5)
 
     fingerVectorDefination = numpy.array([[2, 3, 4], [5, 6, 8], [9, 10, 12],
