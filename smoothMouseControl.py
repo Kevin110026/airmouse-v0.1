@@ -36,8 +36,8 @@ class control:
     def setPos(self):
         self.speedMove()
         x, y = self.getPos()
-        x = int(x)
-        y = int(y)
+        x = round(x)
+        y = round(y)
         mouse.move(x, y)
 
     def getPos(self):

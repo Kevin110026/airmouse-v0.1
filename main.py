@@ -6,7 +6,7 @@ import numpy
 import fps
 import gesture
 
-mouseControl = smoothMouseControl.control(smooth=3)
+mouseControl = smoothMouseControl.control(smooth=5)
 mouseControlScale = int(2.5 * mouseControl.screenSize.sum() / 2)
 
 cap = cv2.VideoCapture(0)
@@ -54,8 +54,8 @@ while True:
             curGesture = gesture.analize(mainLandmark.landmark)
             curGestureName = gesture.gesturesName(curGesture)
 
-            print(curGesture)
-            print(curGestureName)
+            # print(curGesture)
+            # print(curGestureName)
 
             handX = mainLandmark.landmark[9].x
             handY = mainLandmark.landmark[9].y
