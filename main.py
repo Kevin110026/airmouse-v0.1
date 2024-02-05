@@ -69,7 +69,7 @@ while True:
             else:
                 fistExitCount = 0
 
-                if (curGesture[0] == 1):
+                if (curGesture[0] == 1 or curGesture[3] == 1):
                     if (type(lastHandPosition) != type(None)):
                         deltaHandPosition = handPosition - lastHandPosition
                         deltaMousePos = deltaHandPosition * mouseControlScale
