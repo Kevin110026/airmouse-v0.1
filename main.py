@@ -47,6 +47,10 @@ while True:
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         result = hands.process(imgRGB)
 
+        curFps = FPS.get()
+        avgFps = FPS.avgFps()
+        print(avgFps)
+
         if (result.multi_hand_landmarks):
 
             mainLandmark = result.multi_hand_landmarks[0]
@@ -73,6 +77,7 @@ while True:
                     if (type(lastHandPosition) != type(None)):
                         deltaHandPosition = handPosition - lastHandPosition
                         deltaMousePos = deltaHandPosition * mouseControlScale
+                        deltaMousePos *= curFps / avgFps
                         if (curGesture[4] == 1):
                             deltaMousePos *= 0.1
                         if (curGesture[3] == 1):
@@ -115,8 +120,7 @@ while True:
 
         else:
             mouseExit(curGesture=lastGesture)
-
-        curFps = FPS.get()
+            
         cv2.putText(img, "fps: " + str(int(curFps)), (0, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2)
 
