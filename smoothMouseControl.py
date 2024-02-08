@@ -2,6 +2,7 @@ import mouse
 import numpy
 import pyautogui
 import screeninfo
+import tools
 
 
 def mousePosScale(Pos, scale):
@@ -28,10 +29,25 @@ class control:
         self.mousePosRecord.resize((self.smooth, 2))
 
     def speedMove(self):
-        if (((self.mousePosRecord[0] - self.getPos())**2).sum()**0.5
-                >= 0.05 * self.avgScreenSize):
-            for i in range(1, self.smooth):
-                self.mousePosRecord[i] = self.mousePosRecord[0]
+        parameter = 0.7
+        val = 0
+        center = self.getPos()
+        for i in range(0, self.smooth):
+            val += tools.getVectorLength(
+                self.mousePosRecord[i] -
+                center) * parameter**i / self.avgScreenSize
+
+        val *= 10
+        val = min(1, val)
+        print("val:",val)
+        for i in range(1, self.smooth):
+            self.mousePosRecord[i] = self.mousePosRecord[
+                0] * val + self.mousePosRecord[i] * (1 - val)
+
+        # if (((self.mousePosRecord[0] - self.getPos())**2).sum()**0.5
+        #         >= 0.01 * self.avgScreenSize):
+        #     for i in range(1, self.smooth):
+        #         self.mousePosRecord[i] = self.mousePosRecord[0]
 
     def setPos(self):
         self.speedMove()
@@ -72,5 +88,5 @@ class control:
 
     def scroll(self, val):
         # mouse.wheel(int(val / 50))
-        pyautogui.scroll(int(val),_pause=False)
+        pyautogui.scroll(int(val), _pause=False)
         # pyautogui.scroll 記得要 _pause=False 不然會很卡

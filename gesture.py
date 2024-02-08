@@ -29,6 +29,7 @@ def analize(landmark: numpy.ndarray) -> numpy.ndarray:
             points[j][0] = curPoint.x
             points[j][1] = curPoint.y
             points[j][2] = curPoint.z
+            # points[j][2] = 0
 
         fingersVector[i] = numpy.array(
             [points[0] - points[1], points[2] - points[1]])

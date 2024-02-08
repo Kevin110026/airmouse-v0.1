@@ -6,7 +6,7 @@ import numpy
 import fps
 import gesture
 
-mouseControl = smoothMouseControl.control(smooth=5)
+mouseControl = smoothMouseControl.control(smooth=30)
 mouseControlScale = int(2.5 * mouseControl.screenSize.sum() / 2)
 
 cap = cv2.VideoCapture(0)
