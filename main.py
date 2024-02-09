@@ -1,26 +1,29 @@
 import cv2
 import mediapipe as mp
-import smoothMouseControl
 import numpy
 
 import fps
 import gesture
+import mouseControl
+import smoothHand
 
-mouseControl = smoothMouseControl.control(smooth=30)
+mouseControl = mouseControl.control()
+handSmoother = smoothHand.smoothHand(smooth=30)
+
 mouseControlScale = int(2.5 * mouseControl.screenSize.sum() / 2)
 
 cap = cv2.VideoCapture(0)
 
 mpHands = mp.solutions.hands
-hands = mpHands.Hands(model_complexity=1,
-                      max_num_hands=1,
-                      min_detection_confidence=0.95,
-                      min_tracking_confidence=0.01)
+handsModel = mpHands.Hands(model_complexity=1,
+                           max_num_hands=1,
+                           min_detection_confidence=0.95,
+                           min_tracking_confidence=0.01)
 mpDraw = mp.solutions.drawing_utils
 
 FPS = fps.fps()
 lastGesture = numpy.zeros(5)
-lastHandPosition = None
+lastSmoothHandPos = None
 
 fistExitCount = 0
 lastMouseStatus = 0
@@ -45,7 +48,7 @@ while True:
 
     if (ret):
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        result = hands.process(imgRGB)
+        result = handsModel.process(imgRGB)
 
         curFps = FPS.get()
         avgFps = FPS.avgFps()
@@ -63,7 +66,7 @@ while True:
 
             handX = mainLandmark.landmark[9].x
             handY = mainLandmark.landmark[9].y
-            handPosition = numpy.array((1 - handX, handY))
+            rawHandPos = numpy.array((1 - handX, handY))
 
             if (curGestureName == "fist"):
                 fistExitCount += 1
@@ -74,8 +77,10 @@ while True:
                 fistExitCount = 0
 
                 if (curGesture[0] == 1 or curGesture[3] == 1):
-                    if (type(lastHandPosition) != type(None)):
-                        deltaHandPosition = handPosition - lastHandPosition
+                    handSmoother.pushPos(rawHandPos)
+                    smoothHandPos = handSmoother.getPos()
+                    if (type(lastSmoothHandPos) != type(None)):
+                        deltaHandPosition = smoothHandPos - lastSmoothHandPos
                         deltaMousePos = deltaHandPosition * mouseControlScale
                         deltaMousePos *= curFps / avgFps
                         if (curGesture[4] == 1):
@@ -84,11 +89,13 @@ while True:
                             mouseControl.scroll(deltaMousePos[1])
                             pass
                         else:
-                            mouseControl.pushDis(deltaMousePos)
-                    lastHandPosition = handPosition
+                            mouseControl.addDis(deltaMousePos)
+                    else:
+                        handSmoother.setPos(rawHandPos)
+
+                    lastSmoothHandPos = smoothHandPos
                 else:
-                    lastHandPosition = None
-                    mouseControl.setToMousePos()
+                    lastSmoothHandPos = None
 
                 if (curGesture[1] != lastGesture[1]):
                     if (curGesture[1] == 1):
@@ -120,7 +127,7 @@ while True:
 
         else:
             mouseExit(curGesture=lastGesture)
-            
+
         cv2.putText(img, "fps: " + str(int(curFps)), (0, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2)
 
