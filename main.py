@@ -52,7 +52,7 @@ while True:
 
         curFps = FPS.get()
         avgFps = FPS.avgFps()
-        print(avgFps)
+        # print(avgFps)
 
         if (result.multi_hand_landmarks):
 
@@ -124,6 +124,17 @@ while True:
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
                 # for i, lm in enumerate(handLms.landmark):
                 #     print(i, lm.x, lm.y)
+
+            imgHigh = img.shape[0]
+            imgWidth = img.shape[1]
+            for i in range(21):
+                x = mainLandmark.landmark[i].x * imgWidth
+                y = mainLandmark.landmark[i].y * imgHigh
+                z = mainLandmark.landmark[i].z
+                x = int(x)
+                y = int(y)
+                cv2.putText(img, str(i), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1-z*10,
+                            (255, 0, 0), 2)
 
         else:
             mouseExit(curGesture=lastGesture)

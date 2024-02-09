@@ -41,7 +41,7 @@ def analize(landmark: numpy.ndarray) -> numpy.ndarray:
                                            fingersVector[i][1])
 
     fingersResult = numpy.zeros(5)
-    fingersTriggerDegrees = numpy.array([130, 100, 100, 100, 100])
+    fingersTriggerDegrees = numpy.array([120, 100, 100, 100, 100])
     for i in range(5):
         if (abs(fingersDegree[i]) < fingersTriggerDegrees[i]):
             fingersResult[i] = 1
