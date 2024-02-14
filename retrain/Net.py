@@ -67,7 +67,7 @@ class Data():
                 tmp.clear()
         print(len(self.samples))
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.samples) % self.batchsize #to change train data lenth pls change batch when declaring, not to change the code
 
     def __getitem__(self, idx):

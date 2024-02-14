@@ -22,6 +22,20 @@ def resize_and_show(image,s):
   cv2.imshow(s, img)
   cv2.waitKey(1)
 
+
+def apply_hue_offset(image, hue_offset):# 0 is no change; 0<=huechange<=180
+    # convert img to hsv
+    img_hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    h = img_hsv[:,:,0]
+    s = img_hsv[:,:,1]
+    v = img_hsv[:,:,2]
+    # shift the hue
+    img_hsv = cv2.add(h, hue_offset)
+    # combine new hue with s and v
+    img_hsv = cv2.merge([img_hsv,s,v])
+    # convert from HSV to BGR
+    return cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR)
+    
 def run():
     global time_s
     global points_depth
