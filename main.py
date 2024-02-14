@@ -9,6 +9,7 @@ import smoothHand
 
 mouseControl = mouseControl.control()
 handSmoother = smoothHand.smoothHand(smooth=30)
+MAXFPS = 30
 
 mouseControlScale = int(2.5 * mouseControl.screenSize.sum() / 2)
 
@@ -47,12 +48,16 @@ while True:
     ret, img = cap.read()
 
     if (ret):
+        imgHigh = img.shape[0]
+        imgWidth = img.shape[1]
+        imgSize = (imgHigh+imgWidth)/2
+        
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         result = handsModel.process(imgRGB)
 
-        curFps = FPS.get()
+        curFps = FPS.get(limitFps=MAXFPS)
         avgFps = FPS.avgFps()
-        # print(avgFps)
+        print(round(avgFps))
 
         if (result.multi_hand_landmarks):
 
@@ -66,6 +71,9 @@ while True:
 
             handX = mainLandmark.landmark[9].x
             handY = mainLandmark.landmark[9].y
+            handX *= imgWidth / imgSize
+            handY *= imgHigh / imgSize
+            
             rawHandPos = numpy.array((1 - handX, handY))
 
             if (curGestureName == "fist"):
@@ -125,8 +133,6 @@ while True:
                 # for i, lm in enumerate(handLms.landmark):
                 #     print(i, lm.x, lm.y)
 
-            imgHigh = img.shape[0]
-            imgWidth = img.shape[1]
             for i in range(21):
                 x = mainLandmark.landmark[i].x * imgWidth
                 y = mainLandmark.landmark[i].y * imgHigh

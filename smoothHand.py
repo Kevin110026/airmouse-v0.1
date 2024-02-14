@@ -41,7 +41,7 @@ class smoothHand:
         val *= 50
         val -= 0.1
         val = min(1, max(0, val))
-        print("val:", val)
+        # print("val:", val)
         # bigger the val is, more rapid the change of hand position output is
         # but the output is less stable meanwhile
 

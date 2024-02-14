@@ -5,12 +5,14 @@ import numpy
 class fps:
 
     def __init__(self, avgLen=30):
-        self.lastTime = time.time()
+        self.lastTime = time.perf_counter()
         self.avgLen = avgLen
         self.avgFpsRecord = numpy.zeros(self.avgLen)
 
-    def get(self):
-        curTime = time.time()
+    def get(self, limitFps=999999):
+        curTime = time.perf_counter()
+        while (limitFps and curTime < self.lastTime + 1 / limitFps):
+            curTime = time.perf_counter()
         try:
             ans = 1 / (curTime - self.lastTime)
         except:
