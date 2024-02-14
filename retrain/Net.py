@@ -8,7 +8,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') #use gpu i
 time_s=10
 points_depth=3
 points_hand=21
-train = False
+train = False #It will be retraining everytime it run if set to True
 
 class Net(nn.Module): #CNN
     def __init__(self):

@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch import optim
 from mediapipe.framework.formats import landmark_pb2
 from Net import *
-train_with_cam = False
+train_with_cam = True #dont set this to false if its not lagging for better result
 DESIRED_HEIGHT = 480
 DESIRED_WIDTH = 480
 def resize_and_show(image,s):
