@@ -2,5 +2,6 @@ screeninfo
 pyautogui
 mediapipe
 mouse
-smoothMouseControl
 numpy
+torch
+pickle
