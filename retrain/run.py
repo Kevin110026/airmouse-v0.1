@@ -58,6 +58,8 @@ def run():
                 annotated_image = cv2.flip(frame.copy(), 1)
                 
                 if not results.multi_hand_landmarks:
+                    if not train_with_cam:
+                        continue
                     List = []
                     for j in range(points_hand):
                         List.append((0.5,0.5,0))
@@ -72,7 +74,7 @@ def run():
                                 sum += 1
                         if sum==0:
                             count+=1
-                    if count<7 and len(Big_List)==10 and train_with_cam:
+                    if count<7 and len(Big_List)==10:
                         annotated_image = cv2.putText(annotated_image, '++++++', (50, 50),
                                                       cv2.FONT_HERSHEY_SIMPLEX,
                                                       1, (255, 0, 0), 2, cv2.LINE_AA)
