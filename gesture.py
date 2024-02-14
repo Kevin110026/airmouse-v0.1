@@ -26,9 +26,15 @@ def analize(landmark: numpy.ndarray) -> numpy.ndarray:
         for j in range(3):
             curPoint = landmark[curDefination[j]]
             # points[j] = numpy.array([curPoint.x, curPoint.y])
-            points[j][0] = curPoint.x
-            points[j][1] = curPoint.y
-            points[j][2] = curPoint.z
+            try:
+                points[j][0] = curPoint.x
+                points[j][1] = curPoint.y
+                points[j][2] = curPoint.z
+            except:
+                points[j][0] = curPoint[0]
+                points[j][1] = curPoint[1]
+                points[j][2] = curPoint[2]
+                
             # points[j][2] = 0
 
         fingersVector[i] = numpy.array(
@@ -50,6 +56,6 @@ def analize(landmark: numpy.ndarray) -> numpy.ndarray:
 
     for i in range(5):
         fingersDegree[i]=int(fingersDegree[i])
-    # print(fingersDegree)
+    print(fingersDegree)
 
     return fingersResult
