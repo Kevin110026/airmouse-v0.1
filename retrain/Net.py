@@ -42,15 +42,15 @@ class Data():
     def __init__(self, batch):
         self.batchsize = batch
         self.samples = []
-        file = open("0000000.obj", 'rb')
+        file = open("retrain/0000000.obj", 'rb')
         List = pickle.load(file)
-        file = open("0000001.obj", 'rb')
+        file = open("retrain/0000001.obj", 'rb')
         List += pickle.load(file)
-        file = open("0000002.obj", 'rb')
+        file = open("retrain/0000002.obj", 'rb')
         List += pickle.load(file)
-        file = open("0000003.obj", 'rb')
+        file = open("retrain/0000003.obj", 'rb')
         List += pickle.load(file)
-        file = open("0000004.obj", 'rb')
+        file = open("retrain/0000004.obj", 'rb')
         List += pickle.load(file) #too lazy to do it in loops, can rewrite this if required
         
         tmp=[]
@@ -69,7 +69,7 @@ class Data():
     def __len__(self):
         return len(self.samples) % self.batchsize #to change train data lenth pls change batch when declaring, not to change the code
 
-    def __getitem__(self):
+    def __getitem__(self, idx):
         global time_s
         global points_depth
         global points_hand
@@ -136,6 +136,6 @@ for epoch in range(num_epochs):
 
         if (i + 1) % 10 == 0:
             print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
-                  .format(epoch + 1, num_epochs, i + 1, total_step, loss.item())) #正則表達式 go learn if u cant understand what this is
-
+                  .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
+            
 torch.save(model.state_dict(), 'model1.ckpt') #save the model to load it later
