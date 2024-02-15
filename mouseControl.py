@@ -30,7 +30,7 @@ class control:
         pyautogui.mouseUp(button=button)
 
     def mouseDoubleClick(self, button):
-        pyautogui.doubleClick(button=button)
+        pyautogui.doubleClick(button=button, _pause=False)
 
     def keyDown(self, button):
         pyautogui.keyDown(button)
