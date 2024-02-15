@@ -58,6 +58,11 @@ Original method: This can be done by left clicking twice fast.
 Another method: Curve forefinger first then curve middle finger to double click.
         
 `This additional rule is designed to make you still be able to double click under low fps, which is hard to be done by the original method`
+## zooming 
+**thumb & ring finger:**
+
+curve both of them of the same time to zoom in/out the page
+
 
 # Common Issues:
 

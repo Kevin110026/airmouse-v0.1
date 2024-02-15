@@ -14,13 +14,13 @@ handSmoother = smoothHand.smoothHand(smooth=30)
 MAXFPS = 60
 CAM_NUM = 0
 
-
 mouseControlScale = int(2.5 * mouseControl.screenSize.sum() / 2)
 
 cap = cv2.VideoCapture(CAM_NUM)
 
-if cap is None or not cap.isOpened(): 
-    raise Exception('Unable to access camera, please check README.md for more info')
+if cap is None or not cap.isOpened():
+    raise Exception(
+        'Unable to access camera, please check README.md for more info')
 
 mpHands = mp.solutions.hands
 handsModel = mpHands.Hands(model_complexity=1,
@@ -33,7 +33,8 @@ FPS = fps.fps()
 actionStatus = {
     "leftMouseHold": False,
     "rightClickHold": False,
-    "doubleClicked": False
+    "doubleClicked": False,
+    "ctrlZooming": False
 }
 lastSmoothHandPos = None
 
@@ -50,6 +51,9 @@ def mouseExit(actionStatus=actionStatus):
     if (actionStatus["rightClickHold"]):
         mouseControl.mouseUp(button="right")
         actionStatus["rightClickHold"] = False
+    if (actionStatus["ctrlZooming"]):
+        mouseControl.keyUp(button="ctrl")
+        actionStatus["ctrlZooming"] = False
 
     # if (curGesture[4]):
     #     mouseControl.keyUp(button="ctrl")
@@ -117,6 +121,16 @@ while True:
                                 deltaMousePos *= 0.1
                             # moving or scrolling
                             if (curGesture[3] == 1):
+                                # zooming
+                                if (curGesture[0]):
+                                    if (not actionStatus["ctrlZooming"]):
+                                        mouseControl.keyDown(button="ctrl")
+                                        actionStatus["ctrlZooming"] = True
+                                else:
+                                    if (actionStatus["ctrlZooming"]):
+                                        mouseControl.keyUp(button="ctrl")
+                                        actionStatus["ctrlZooming"] = False
+                                    
                                 mouseControl.scroll(deltaMousePos[1])
                             else:
                                 mouseControl.addDis(deltaMousePos)
@@ -164,7 +178,7 @@ while True:
 
             else:
                 lastSmoothHandPos = None
-                
+
             for handLms in result.multi_hand_landmarks:
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
                 # for i, lm in enumerate(handLms.landmark):
