@@ -56,6 +56,6 @@ def analize(landmark: numpy.ndarray) -> numpy.ndarray:
 
     for i in range(5):
         fingersDegree[i]=int(fingersDegree[i])
-    print(fingersDegree)
+    # print(fingersDegree)
 
     return fingersResult

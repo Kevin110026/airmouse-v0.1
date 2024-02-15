@@ -1,15 +1,17 @@
 import cv2
 import mediapipe as mp
 import numpy
+import copy
 
 import fps
 import gesture
 import mouseControl
 import smoothHand
+import tools
 
 mouseControl = mouseControl.control()
 handSmoother = smoothHand.smoothHand(smooth=30)
-MAXFPS = 60
+MAXFPS = 5
 
 mouseControlScale = int(2.5 * mouseControl.screenSize.sum() / 2)
 
@@ -24,6 +26,11 @@ mpDraw = mp.solutions.drawing_utils
 
 FPS = fps.fps()
 lastGesture = numpy.zeros(5)
+actionStatus = {
+    "leftMouseHold": False,
+    "rightClickHold": False,
+    "doubleClicked": False
+}
 lastSmoothHandPos = None
 
 fistExitCount = 0
@@ -32,18 +39,16 @@ lastMouseStatus = 0
 handControlActivated = False
 
 
-def mouseExit(curGesture: numpy.ndarray):
-    if (curGesture[1]):
+def mouseExit(actionStatus=actionStatus):
+    if (actionStatus["leftMouseHold"]):
         mouseControl.mouseUp(button="left")
-    if (curGesture[2]):
+        actionStatus["leftMouseHold"] = False
+    if (actionStatus["rightClickHold"]):
         mouseControl.mouseUp(button="right")
+        actionStatus["rightClickHold"] = False
+
     # if (curGesture[4]):
     #     mouseControl.keyUp(button="ctrl")
-
-    for i in range(5):
-        curGesture[i] = 0
-
-    return curGesture
 
 
 while True:
@@ -59,7 +64,7 @@ while True:
 
         curFps = FPS.get(limitFps=MAXFPS)
         avgFps = FPS.avgFps()
-        print(round(avgFps))
+        # print(round(avgFps))
 
         if (result.multi_hand_landmarks):
 
@@ -91,8 +96,8 @@ while True:
                 if (curGestureName == "fist"):
                     fistExitCount += 1
                     if (fistExitCount >= 5):
-                        mouseExit(curGesture=lastGesture)
-                        break
+                        handControlActivated = False
+                        mouseExit(actionStatus=actionStatus)
                 else:
                     fistExitCount = 0
 
@@ -103,33 +108,55 @@ while True:
                             deltaHandPosition = smoothHandPos - lastSmoothHandPos
                             deltaMousePos = deltaHandPosition * mouseControlScale
                             deltaMousePos *= curFps / avgFps
+                            # slow mode
                             if (curGesture[4] == 1):
                                 deltaMousePos *= 0.1
+                            # moving or scrolling
                             if (curGesture[3] == 1):
                                 mouseControl.scroll(deltaMousePos[1])
-                                pass
                             else:
                                 mouseControl.addDis(deltaMousePos)
                         else:
                             handSmoother.setPos(rawHandPos)
+                            smoothHandPos = handSmoother.getPos()
 
                         lastSmoothHandPos = smoothHandPos
                     else:
                         lastSmoothHandPos = None
 
-                    if (curGesture[1] != lastGesture[1]):
-                        if (curGesture[1] == 1):
-                            # print("leftClick")
+                    # left mouse click
+                    if (curGesture[1]):
+                        if (not actionStatus["leftMouseHold"]):
                             mouseControl.mouseDown(button="left")
-                        else:
-                            mouseControl.mouseUp(button="left")
+                            actionStatus["leftMouseHold"] = True
 
-                    if (curGesture[2] != lastGesture[2]):
-                        if (curGesture[2] == 1):
+                        # left mouse double click
+                        if (curGesture[2]):
+                            if (not actionStatus["doubleClicked"]):
+                                mouseControl.mouseDoubleClick(button="left")
+                                actionStatus["doubleClicked"] = True
+
+                                print("double clicked!")
+                        else:
+                            actionStatus["doubleClicked"] = False
+
+                    else:
+                        actionStatus["doubleClicked"] = False
+                        if (actionStatus["leftMouseHold"]):
+                            mouseControl.mouseUp(button="left")
+                            actionStatus["leftMouseHold"] = False
+
+                    # right mouse click
+                    if (curGesture[2]):
+                        if (not actionStatus["rightClickHold"]
+                                and not actionStatus["doubleClicked"]):
                             # print("rightClick")
                             mouseControl.mouseDown(button="right")
-                        else:
+                            actionStatus["rightClickHold"] = True
+                    else:
+                        if (actionStatus["rightClickHold"]):
                             mouseControl.mouseUp(button="right")
+                            actionStatus["rightClickHold"] = False
 
                     lastGesture = curGesture
 
@@ -149,7 +176,7 @@ while True:
 
         else:
             handControlActivated = False
-            mouseExit(curGesture=lastGesture)
+            mouseExit(actionStatus=actionStatus)
 
         cv2.putText(img, "fps: " + str(int(curFps)), (0, 50),
                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2)

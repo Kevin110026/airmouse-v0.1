@@ -29,6 +29,9 @@ class control:
     def mouseUp(self, button):
         pyautogui.mouseUp(button=button)
 
+    def mouseDoubleClick(self, button):
+        pyautogui.doubleClick(button=button)
+
     def keyDown(self, button):
         pyautogui.keyDown(button)
 
