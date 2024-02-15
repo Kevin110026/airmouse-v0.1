@@ -119,17 +119,19 @@ while True:
                             # slow mode
                             if (curGesture[4] == 1):
                                 deltaMousePos *= 0.1
+                            
+                            # zooming
+                            if(curGesture[0] and curGesture[3]):
+                                if (not actionStatus["ctrlZooming"]):
+                                    mouseControl.keyDown(button="ctrl")
+                                    actionStatus["ctrlZooming"] = True
+                            else:
+                                if (actionStatus["ctrlZooming"]):
+                                    mouseControl.keyUp(button="ctrl")
+                                    actionStatus["ctrlZooming"] = False
+                                
                             # moving or scrolling
                             if (curGesture[3] == 1):
-                                # zooming
-                                if (curGesture[0]):
-                                    if (not actionStatus["ctrlZooming"]):
-                                        mouseControl.keyDown(button="ctrl")
-                                        actionStatus["ctrlZooming"] = True
-                                else:
-                                    if (actionStatus["ctrlZooming"]):
-                                        mouseControl.keyUp(button="ctrl")
-                                        actionStatus["ctrlZooming"] = False
                                     
                                 mouseControl.scroll(deltaMousePos[1])
                             else:
