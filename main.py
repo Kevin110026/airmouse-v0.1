@@ -140,7 +140,7 @@ while True:
                                 mouseControl.mouseDoubleClick(button="left")
                                 actionStatus["doubleClicked"] = True
 
-                                print("double clicked!")
+                                # print("double clicked!")
                         else:
                             actionStatus["doubleClicked"] = False
 
