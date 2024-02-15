@@ -8,6 +8,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') #use gpu i
 time_s=10
 points_depth=3
 points_hand=21
+train = False
 
 class Net(nn.Module): #CNN
     def __init__(self):
@@ -73,8 +74,8 @@ class Data():
         global time_s
         global points_depth
         global points_hand
-        All_data = []
-        All_labels = []
+        All_data = np.array()
+        All_labels = np.array()
         for b in range(self.batchsize):
             obj = random.randrange(len(self.samples))
             data = self.samples[obj].copy()
@@ -116,26 +117,27 @@ train_loader = Data(batch=64)
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 criterion = nn.MSELoss()
 
-num_epochs=200
-total_step = len(train_loader)
-for epoch in range(num_epochs):
-    for i in range(total_step):
-        data, labels = train_loader.__getitem__(i)
-        # Move tensors to the configured device
-        data = data.to(device)
-        labels = labels.to(device)
+if train:
+    num_epochs=200
+    total_step = len(train_loader)
+    for epoch in range(num_epochs):
+        for i in range(total_step):
+            data, labels = train_loader.__getitem__(i)
+            # Move tensors to the configured device
+            data = data.to(device)
+            labels = labels.to(device)
 
-        # Forward pass
-        outputs = model(data)
-        loss = criterion(outputs, labels)
+            # Forward pass
+            outputs = model(data)
+            loss = criterion(outputs, labels)
 
-        # Backprpagation and optimization
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+            # Backprpagation and optimization
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        if (i + 1) % 10 == 0:
-            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
-                  .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
-            
+            if (i + 1) % 10 == 0:
+                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
+                    .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
+                
 torch.save(model.state_dict(), 'model1.ckpt') #save the model to load it later

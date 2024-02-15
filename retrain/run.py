@@ -9,7 +9,7 @@ import torch.nn as nn
 from torch import optim
 from mediapipe.framework.formats import landmark_pb2
 from Net import *
-
+train_with_cam = False
 DESIRED_HEIGHT = 480
 DESIRED_WIDTH = 480
 def resize_and_show(image,s):
@@ -56,7 +56,10 @@ def run():
 
                 image_hight, image_width, _ = frame.shape
                 annotated_image = cv2.flip(frame.copy(), 1)
+                
                 if not results.multi_hand_landmarks:
+                    if not train_with_cam:
+                        continue
                     List = []
                     for j in range(points_hand):
                         List.append((0.5,0.5,0))
