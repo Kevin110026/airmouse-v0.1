@@ -65,6 +65,6 @@ Another method: Curve forefinger first then curve middle finger to double click.
 
 `Exception: Unable to access camera, please check README.md for more info`
 
-check if the camera wasnt attached, or if the permission got denied 
+check if the camera wasnt attached, or the permission got denied 
 
-you can also try changing the `CAM_NUM` inside main.py(line 15) to 1 or 2 (depending or ur camera's id)
+you can also try changing the `CAM_NUM` inside main.py(line 15) to 1 or 2 (depending on ur camera's id)
