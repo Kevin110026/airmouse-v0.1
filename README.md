@@ -61,7 +61,7 @@ Another method: Curve forefinger first then curve middle finger to double click.
 ## zooming 
 **thumb & ring finger:**
 
-curve both of them of the same time to zoom in/out the page
+curve both of them then move your hand up/down to zoom in/out the page
 
 
 # Common Issues:
