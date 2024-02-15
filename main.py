@@ -25,7 +25,6 @@ handsModel = mpHands.Hands(model_complexity=1,
 mpDraw = mp.solutions.drawing_utils
 
 FPS = fps.fps()
-lastGesture = numpy.zeros(5)
 actionStatus = {
     "leftMouseHold": False,
     "rightClickHold": False,
@@ -158,7 +157,6 @@ while True:
                             mouseControl.mouseUp(button="right")
                             actionStatus["rightClickHold"] = False
 
-                    lastGesture = curGesture
 
             for handLms in result.multi_hand_landmarks:
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
