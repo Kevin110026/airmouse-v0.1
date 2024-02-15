@@ -157,6 +157,9 @@ while True:
                             mouseControl.mouseUp(button="right")
                             actionStatus["rightClickHold"] = False
 
+            else:
+                lastSmoothHandPos = None
+                
             for handLms in result.multi_hand_landmarks:
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
                 # for i, lm in enumerate(handLms.landmark):
