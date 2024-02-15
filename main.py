@@ -12,10 +12,15 @@ import tools
 mouseControl = mouseControl.control()
 handSmoother = smoothHand.smoothHand(smooth=30)
 MAXFPS = 60
+CAM_NUM = 0
+
 
 mouseControlScale = int(2.5 * mouseControl.screenSize.sum() / 2)
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(CAM_NUM)
+
+if cap is None or not cap.isOpened(): 
+    raise Exception('Unable to access camera, please check README.md for more info')
 
 mpHands = mp.solutions.hands
 handsModel = mpHands.Hands(model_complexity=1,

@@ -17,9 +17,9 @@ after the camera is activated, move your hand into the camera
 
 curve your thumb to start controlling mouse by hand
 
-curve all fingers to quit controlling(looks like cat's paws)
+curve all fingers to quit controlling mode(looks like a cat's paw)
 
-the system quit controlling automatically once it doesn't detect any hand with camera
+the system quit controlling mode automatically once the camera can't detect any hand
 
 ## mouse moving
 **thumb:**
@@ -59,4 +59,12 @@ Another method: Curve forefinger first then curve middle finger to double click.
         
 `This additional rule is designed to make you still be able to double click under low fps, which is hard to be done by the original method`
 
+# Common Issues:
 
+## camera
+
+`Exception: Unable to access camera, please check README.md for more info`
+
+check if the camera wasnt attached, or if the permission got denied 
+
+you can also try changing the `CAM_NUM` inside main.py(line 15) to 1 or 2 (depending or ur camera's id)
