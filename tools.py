@@ -5,7 +5,8 @@ import numpy
 def getVectorLength(vector: numpy.ndarray) -> float:
     return ((vector**2).sum())**0.5
 
-def getLength(vector: numpy.ndarray) ->float:
+
+def getLength(vector: numpy.ndarray) -> float:
     return ((vector**2).sum())**0.5
 
 

@@ -11,7 +11,7 @@ import tools
 
 mouseControl = mouseControl.control()
 handSmoother = smoothHand.smoothHand(smooth=30)
-MAXFPS = 5
+MAXFPS = 60
 
 mouseControlScale = int(2.5 * mouseControl.screenSize.sum() / 2)
 
@@ -156,7 +156,6 @@ while True:
                         if (actionStatus["rightClickHold"]):
                             mouseControl.mouseUp(button="right")
                             actionStatus["rightClickHold"] = False
-
 
             for handLms in result.multi_hand_landmarks:
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
