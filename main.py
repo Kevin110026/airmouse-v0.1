@@ -46,6 +46,16 @@ fistExitCount = 0
 lastMouseStatus = 0
 
 
+def handImageFilter(img, rectangle: numpy.ndarray) -> None:
+    cv2.rectangle(
+        img=img,
+        pt1=(rectangle.min(0).astype(int)),
+        pt2=(rectangle.max(0).astype(int)),
+        color=(0, 0, 0),
+        thickness=-1,
+    )
+
+
 def mouseExit(actionStatus=actionStatus):
     if (actionStatus["leftMouseHold"]):
         mouseControl.mouseUp(button="left")
@@ -104,6 +114,14 @@ while True:
             curGesture = gesture.analize(gestureLandMark)
             curGestureName = gesture.gesturesName(curGesture)
 
+            proceededImg = copy.deepcopy(img)
+            handImageFilter(
+                proceededImg,
+                numpy.array((gestureLandMark.min(axis=0)[:2] * imgSize,
+                             gestureLandMark.max(axis=0)[:2] * imgSize)))
+            cv2.imshow("proceeded img", proceededImg)
+
+
             # print(curGesture)
             # print(curGestureName)
 
@@ -115,7 +133,7 @@ while True:
             rawHandPos = numpy.array((1 - handX, handY))
 
             # print(handControlActivationCount, fistExitCount)
-            
+
             if (curGestureName == "fist"):
                 fistExitCount += 1
                 if (fistExitCount >= 5):
@@ -123,7 +141,7 @@ while True:
                     mouseExit(actionStatus=actionStatus)
             else:
                 fistExitCount = 0
-                
+
             if (not fistExitCount and curGesture[0] == 1):
                 handControlActivationCount += 1
                 if (handControlActivationCount >= 5):
