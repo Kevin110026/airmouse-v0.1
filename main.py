@@ -65,7 +65,7 @@ while True:
     ret, img = cap.read()
 
     if (ret):
-        cv2.imshow("img1", img)
+        # cv2.imshow("img1", img)
         imgHigh = img.shape[0]
         imgWidth = img.shape[1]
         imgSize = (imgHigh + imgWidth) / 2
@@ -156,8 +156,8 @@ while True:
 
                         # moving or scrolling
                         if (curGesture[3] == 1):
-
                             mouseControl.scroll(deltaMousePos[1])
+                            mouseControl.hscroll(deltaMousePos[0])
                         else:
                             mouseControl.addDis(deltaMousePos)
                     else:
