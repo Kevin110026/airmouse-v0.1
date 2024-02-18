@@ -13,13 +13,17 @@ don't blame me if I mess it up instead...
 
 # how to use:
     
-after the camera is activated, move your hand into the camera
+press 'esc' or 'q' to quit
 
-curve your thumb to start controlling mouse by hand
+When "Searching" window pops, move your hand into the camera
+Then, curve your thumb of the hand you want to use to let it know
+After that, "Matching" window should pop up, meaning that it has found your curving hand
+While Matching, hold your thumb still and move your hand a bit to let it get your hand position again. This shouldn't take too long
+After it get your hand position again, "Controlling" window will pop up, meaning that you can start controlling the cursor by your hand!
 
-curve all fingers to quit controlling mode(looks like a cat's paw)
+curve all fingers to quit "Controlling" mode and back to "Searching"(looks like a cat's paw)
 
-the system quit controlling mode automatically once the camera can't detect any hand
+the system also quit "Controlling" mode automatically when the camera can't detect any hand
 
 ## mouse moving
 **thumb:**
