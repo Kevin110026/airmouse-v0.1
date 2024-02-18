@@ -15,11 +15,17 @@ don't blame me if I mess it up instead...
     
 press 'esc' or 'q' to quit
 
-When "Searching" window pops, move your hand into the camera
-Then, curve your thumb of the hand you want to use to let it know
-After that, "Matching" window should pop up, meaning that it has found your curving hand
-While Matching, hold your thumb still and move your hand a bit to let it get your hand position again. This shouldn't take too long
+
+When "Searching" window pops, move your hand into the camera.
+
+Then, curve your thumb of the hand you want to use to let it know.
+
+After that, "Matching" window should pop up, meaning that it has found your curving hand.
+
+While Matching, hold your thumb still and move your hand a bit to let it get your hand position again. This shouldn't take too long.
+
 After it get your hand position again, "Controlling" window will pop up, meaning that you can start controlling the cursor by your hand!
+
 
 curve all fingers to quit "Controlling" mode and back to "Searching"(looks like a cat's paw)
 
