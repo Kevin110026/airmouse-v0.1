@@ -1,5 +1,7 @@
 # Introduction
-this is the next version of the airmouse v0.0
+this is the source code of airmouse, we will keep updating this till the science exhibition ends.
+
+air mouse v0.1 is the next version of the airmouse v0.0
 "supposed" to be more accurate and handy
 
 ...
