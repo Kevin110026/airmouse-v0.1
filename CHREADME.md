@@ -1,35 +1,30 @@
-# Introduction
-this is the next version of the airmouse v0.0
-"supposed" to be more accurate and handy
+# 前言
+薛尹喆大電神把v0.0改成超讚的v0.1 ouob
 
-...
-
-don't blame me if I mess it up instead...
-
-# before use
-- python required
-- install requirements first by runing `pip install -r req.txt` in command line
+# 系統需求
+- 已安裝python
+- 於系統終端執行 `pip install -r req.txt` 以安裝相關套件
 
 
-# how to use:
+# 使用須知:
     
-press 'esc' or 'q' to quit
+按下 'esc' 或 'q' 以退出
 
 
-When *Searching* window pops, move your hand into the area that camera can capture.
+當 *Searching* 視窗彈出時，將您的手移至相機內
 
-Then, curve the thumb of the hand you want to use to make system recognize.
+接著，將您想用來控制滑鼠的手的大拇指彎曲，使系統辨識並追蹤您的手。
 
-After that, *Matching* window should pop up, meaning that it has found your curving hand.
+接著，您會看見*Matching* 視窗，表示系統已辨認出欲控制的手。
 
-While Matching, hold your thumb still and move your hand a bit to make system get your hand's position more precisely. This step won't take too long.
+接著，保持大拇指彎曲並向四周稍微揮動您的手以利系統獲取您的手的詳細位置資訊。這個步驟將不會持續太久，煩請耐心等候。
 
-After the system get your hand position, *Controlling* window will pop up, meaning that you can start controlling the cursor by your hand!
+當系統成功獲取位置後，*Controlling*視窗將彈出，代表您可以開始使用手來控制鼠標了!
 
 
-curve all fingers to quit *Controlling* mode and back to *Searching*(looks like a cat's paw)
+彎曲全部手指會使系統從*Controlling*模式回到 *Searching*模式(此時手會看起來像貓掌一樣)
 
-the system will also quit *Controlling* mode automatically when the camera can't detect any hand within it's range.
+系統將會自動退出*Controlling*模式如果相機已無法拍攝到擁有控制權的手。
 
 ## mouse moving
 **thumb:**
