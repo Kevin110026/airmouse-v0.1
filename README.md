@@ -6,7 +6,7 @@ this is the next version of the airmouse v0.0
 
 don't blame me if I mess it up instead...
 
-sees Chinese(Trad.) readme at
+click to jump to [Chinese(Trad.) readme.md](CHREADME.md)
 
 # before use
 - python required
