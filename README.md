@@ -6,6 +6,8 @@ this is the next version of the airmouse v0.0
 
 don't blame me if I mess it up instead...
 
+sees Chinese(Trad.) readme at
+
 # before use
 - python required
 - install requirements first by runing `pip install -r req.txt` in command line
