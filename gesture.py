@@ -13,7 +13,7 @@ def gesturesName(fingerResult: numpy.ndarray) -> str:
         return "others"
 
 
-def analize(landmark: numpy.ndarray) -> numpy.ndarray:
+def analize(landmark: numpy.ndarray, returnDegree = False) -> numpy.ndarray:
     fingersDegree = numpy.zeros(5)
 
     fingerVectorDefination = numpy.array([[2, 3, 4], [5, 6, 8], [9, 10, 12],
@@ -47,7 +47,7 @@ def analize(landmark: numpy.ndarray) -> numpy.ndarray:
                                            fingersVector[i][1])
 
     fingersResult = numpy.zeros(5)
-    fingersTriggerDegrees = numpy.array([135, 100, 100, 100, 100])
+    fingersTriggerDegrees = numpy.array([150, 100, 100, 100, 100])
     for i in range(5):
         if (abs(fingersDegree[i]) < fingersTriggerDegrees[i]):
             fingersResult[i] = 1
@@ -58,4 +58,7 @@ def analize(landmark: numpy.ndarray) -> numpy.ndarray:
         fingersDegree[i] = int(fingersDegree[i])
     # print(fingersDegree)
 
-    return fingersResult
+    if(returnDegree):
+        return fingersDegree
+    else:
+        return fingersResult

@@ -1,27 +1,28 @@
 import tools
 import numpy
+import copy
 
 
 class smoothHand:
 
-    def __init__(self, smooth=30):
+    def __init__(self, smooth=30) -> None:
         self.smooth = smooth
         self.rawPosRecord = numpy.zeros((self.smooth, 2))
 
-    def setPos(self, Pos: numpy.ndarray):
+    def setPos(self, Pos: numpy.ndarray) -> None:
         for i in range(self.smooth):
-            self.rawPosRecord[i] = Pos
+            self.rawPosRecord[i] = Pos.copy()
 
-    def pushPos(self, Pos: numpy.ndarray):
-        for i in range(self.smooth):
-            self.rawPosRecord[i] = self.rawPosRecord[i - 1]
-        self.rawPosRecord[0] = Pos
+    def pushPos(self, Pos: numpy.ndarray) -> None:
+        for i in range(self.smooth - 1, 0, -1):
+            self.rawPosRecord[i] = self.rawPosRecord[i - 1].copy()
+        self.rawPosRecord[0] = Pos.copy()
         self.__smoothMove()
 
-    def getPos(self):
+    def getPos(self) -> numpy.ndarray:
         return self.rawPosRecord.sum(axis=0) / self.smooth
 
-    def __smoothMove(self):
+    def __smoothMove(self) -> None:
         parameter = 0.95
         val = 0
         center = self.getPos()
@@ -40,7 +41,7 @@ class smoothHand:
         # S / ( (1 - x^n)/(1 - x) ) = 1
 
         val *= 150
-        val -= 0.15
+        val -= 0.10
         val = min(1, max(0, val))
         # print("val:", val)
         # bigger the val is, more rapid the change of hand position output is
