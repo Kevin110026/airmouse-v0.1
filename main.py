@@ -16,11 +16,13 @@ import tools
 
 mouseControl = mouseControl.control()
 handSmoother = smoothHand.smoothHand(smooth=30)
+handSizeSmoother = smoothHand.smoothHand(smooth=30)
 MAX_FPS = 60
 CAM_NUM = 0
 MAX_HANDS_AMOUNT = 10
 
 mouseControlScale = int(2.5 * mouseControl.screenSize.sum() / 2)
+mouseSensitiveScale = 0.2
 
 time.perf_counter()
 print("took " + str(time.perf_counter() - runTimeRecorder) + " sec")
@@ -60,7 +62,8 @@ actionStatus = {
     "leftMouseHold": False,
     "rightClickHold": False,
     "doubleClicked": False,
-    "ctrlZooming": False
+    "ctrlZooming": False,
+    "adjustingMouseSensitive": False,
 }
 lastSmoothHandPos = None
 
@@ -350,18 +353,43 @@ while True:
                     fistExitCount = 0
 
                 if (handControlState == "Activated"):
+                    rawHandSize = tools.getLength(mainGestureLandmark[5] -
+                                                  mainGestureLandmark[17])
 
                     if (curGesture[0] == 1 or curGesture[3] == 1):
                         handSmoother.pushPos(rawHandPos)
+                        handSizeSmoother.pushPos(numpy.array([rawHandSize, 0]))
                         smoothHandPos = handSmoother.getPos()
+                        smoothHandSize = handSizeSmoother.getPos()[0]
                         if (type(lastSmoothHandPos) != type(None)):
                             deltaHandPosition = smoothHandPos - lastSmoothHandPos
-                            deltaMousePos = deltaHandPosition * mouseControlScale
+                            deltaMousePos = deltaHandPosition * mouseControlScale * (
+                                mouseSensitiveScale / smoothHandSize)
                             deltaMousePos *= curFps / avgFps
                             # slow mode
                             if (curGesture[4] == 1):
                                 deltaMousePos *= 0.1
 
+                            # adjusting mouse sensitive
+                            if (curGesture[2] and curGesture[3]):
+                                actionStatus["adjustingMouseSensitive"] = True
+                                mouseSensitiveScale += (deltaHandPosition[1] /
+                                                        smoothHandSize) * 0.1
+                                showingSensitive = numpy.zeros((200, 600, 3),
+                                                               numpy.uint8)
+                                showingSensitive.fill(255)
+                                cv2.putText(showingSensitive,
+                                            str(mouseSensitiveScale), (0, 50),
+                                            cv2.FONT_HERSHEY_SIMPLEX, 2,
+                                            (0, 0, 0), 2)
+                                cv2.imshow("sensitive",showingSensitive)
+                            else:
+                                actionStatus["adjustingMouseSensitive"] = False
+                                try:
+                                    cv2.destroyWindow("sensitive")
+                                except:
+                                    pass
+                                
                             # zooming
                             if (curGesture[0] and curGesture[3]):
                                 if (not actionStatus["ctrlZooming"]):
@@ -373,14 +401,19 @@ while True:
                                     actionStatus["ctrlZooming"] = False
 
                             # moving or scrolling
-                            if (curGesture[3] == 1):
+                            if (actionStatus["adjustingMouseSensitive"]):
+                                pass
+                            elif(curGesture[3] == 1):
                                 mouseControl.scroll(deltaMousePos[1])
                                 mouseControl.hscroll(deltaMousePos[0])
                             else:
                                 mouseControl.addDis(deltaMousePos)
                         else:
                             handSmoother.setPos(rawHandPos)
+                            handSizeSmoother.setPos(
+                                numpy.array([rawHandSize, 0]))
                             smoothHandPos = handSmoother.getPos()
+                            smoothHandSize = handSizeSmoother.getPos()[0]
 
                         lastSmoothHandPos = smoothHandPos
                     else:
@@ -411,7 +444,8 @@ while True:
                     # right mouse click
                     if (curGesture[2]):
                         if (not actionStatus["rightClickHold"]
-                                and not actionStatus["doubleClicked"]):
+                                and not actionStatus["doubleClicked"]
+                                and not actionStatus["adjustingMouseSensitive"]):
                             # print("rightClick")
                             mouseControl.mouseDown(button="right")
                             actionStatus["rightClickHold"] = True
