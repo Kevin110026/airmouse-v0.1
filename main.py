@@ -349,10 +349,11 @@ while True:
                         handControlActivated = False
                         handControlState = "None"
                         mouseExit(actionStatus=actionStatus)
+                        handControlActivationCount.fill(0)
                 else:
                     fistExitCount = 0
 
-                if (handControlState == "Activated"):
+                if (handControlState == "Activated" and not fistExitCount):
                     rawHandSize = tools.getLength(mainGestureLandmark[5] -
                                                   mainGestureLandmark[17])
 
@@ -373,7 +374,7 @@ while True:
                             # adjusting mouse sensitive
                             if (curGesture[2] and curGesture[3]):
                                 actionStatus["adjustingMouseSensitive"] = True
-                                mouseSensitiveScale += (deltaHandPosition[1] /
+                                mouseSensitiveScale += -(deltaHandPosition[1] /
                                                         smoothHandSize) * 0.1
                                 showingSensitive = numpy.zeros((200, 600, 3),
                                                                numpy.uint8)
@@ -490,6 +491,7 @@ while True:
                 handControlState = "None"
                 handControlActivated = False
                 mouseExit(actionStatus=actionStatus)
+                handControlActivationCount.fill(0)
 
     cv2KeyEvent = cv2.waitKey(1)
     if (cv2KeyEvent == ord('q')):

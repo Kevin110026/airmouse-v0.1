@@ -76,7 +76,10 @@ Another method: Curve forefinger first then curve middle finger to double click.
 **thumb & ring finger:**
 
 curve both of them then move your hand up/down to zoom in/out the page
+## sensitive adjusting 
+**middle & ring finger:**
 
+curve both of them then move your hand up/down to adjust mouse sensitive
 
 # Common Issues:
 
