@@ -29,6 +29,9 @@ class control:
     def mouseUp(self, button):
         pyautogui.mouseUp(button=button)
 
+    def mouseDoubleClick(self, button):
+        pyautogui.doubleClick(button=button, _pause=False)
+
     def keyDown(self, button):
         pyautogui.keyDown(button)
 
@@ -39,3 +42,7 @@ class control:
         # mouse.wheel(int(val / 50))
         pyautogui.scroll(int(val), _pause=False)
         # pyautogui.scroll 記得要 _pause=False 不然會很卡
+    
+    def hscroll(self, val):
+        pyautogui.hscroll(int(val), _pause=False)
+        
