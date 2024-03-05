@@ -86,6 +86,7 @@ curve both of them then move your hand up/down to adjust mouse sensitive
 ![空中滑鼠 (7)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/a72c7181-3fe1-4471-8a16-da0a778c84fd)
 
 Curve little finger while doing other actions to make them slower.
+
 Actions include moving, scrolling, zooming, sensitive adjusting.
 
 
