@@ -5,3 +5,5 @@ dataGenerator.py
 main.spec
 build
 dist
+# handSpinDataGen.py
+test.py

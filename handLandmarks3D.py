@@ -112,7 +112,7 @@ while (True):
             handLandmarkDraw = numpy.zeros((3, 21))
 
             for i in range(21):
-                handLandmarkDraw[0][i] = 1 - handLandmark[i][0]
+                handLandmarkDraw[0][i] = handLandmark[i][0]
                 handLandmarkDraw[1][i] = 1 - handLandmark[i][1]
                 handLandmarkDraw[2][i] = handLandmark[i][2]
 

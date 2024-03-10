@@ -4,8 +4,7 @@ import mouse
 import tools
 import copy
 
-a = numpy.array([[1, 2], [3, 4]])
-b=a.copy()
-b[0] = a[0]
-a[1] = b[0]
+a = numpy.array([3**0.5/2,0.5])
 print(a)
+b=tools.rotateVector(a,-30)
+print(b)
