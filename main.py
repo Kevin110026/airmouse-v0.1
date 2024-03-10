@@ -225,16 +225,20 @@ while True:
                         allGestureLandmarks[i][j][
                             0] = allLandmarks[i][j][0] * (imgWidth / imgSize)
                         allGestureLandmarks[i][j][
-                            1] = allLandmarks[i][j][0] * (imgHigh / imgSize)
+                            1] = allLandmarks[i][j][1] * (imgHigh / imgSize)
                         allGestureLandmarks[i][j][
-                            1] = allLandmarks[i][j][0] * (imgWidth / imgSize)
+                            2] = allLandmarks[i][j][2] * (imgWidth / imgSize)
 
                     allGestures[i] = analize(allGestureLandmarks[i])
                     if ((allGestures[i] == numpy.array([1, 0, 0, 0,
                                                         0])).all()):
                         handControlActivationCount[i] += 1
+                        if(handControlActivationCount[i]>10):
+                            handControlActivationCount[i]=10
                     else:
                         handControlActivationCount[i] = 0
+                        if(handControlActivationCount[i]<0):
+                            handControlActivationCount[i]=0
 
                 else:
                     handControlActivationCount[i] = 0
