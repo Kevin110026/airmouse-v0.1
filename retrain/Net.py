@@ -8,7 +8,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') #use gpu i
 time_s=10
 points_depth=3
 points_hand=21
-train = False
+train = False #It will be retraining everytime it run if set to True
 
 class Net(nn.Module): #CNN
     def __init__(self):
@@ -67,7 +67,7 @@ class Data():
                 tmp.clear()
         print(len(self.samples))
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.samples) % self.batchsize #to change train data lenth pls change batch when declaring, not to change the code
 
     def __getitem__(self, idx):
