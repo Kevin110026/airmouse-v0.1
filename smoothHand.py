@@ -1,4 +1,4 @@
-import tools
+from tools import *
 import numpy
 import copy
 
@@ -27,7 +27,7 @@ class smoothHand:
         val = 0
         center = self.getPos()
         for i in range(0, self.smooth):
-            val += tools.getVectorLength(self.rawPosRecord[i] -
+            val += getVectorLength(self.rawPosRecord[i] -
                                          center) * parameter**i
 
         val /= (1 - parameter**self.smooth) / (1 - parameter)

@@ -1,4 +1,4 @@
-import tools
+from tools import *
 import numpy
 
 
@@ -43,7 +43,7 @@ def analize(landmark: numpy.ndarray, returnDegree = False) -> numpy.ndarray:
     # print(fingersVector.shape)
 
     for i in range(5):
-        fingersDegree[i] = tools.getDegree(fingersVector[i][0],
+        fingersDegree[i] = getDegree(fingersVector[i][0],
                                            fingersVector[i][1])
 
     fingersResult = numpy.zeros(5)
