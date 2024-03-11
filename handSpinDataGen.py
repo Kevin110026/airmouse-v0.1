@@ -9,6 +9,7 @@ import matplotlib
 import numpy
 import copy
 import matplotlib.pyplot as plt
+import openpyxl
 
 import fps
 import tools
@@ -76,6 +77,14 @@ hand3D = draw3DHand.handDrawer3D()
 
 FPS = fps.fps()
 startRecord = False
+standardRelativeHandLandmark = numpy.zeros((21,3))
+
+
+
+wb = openpyxl.Workbook()
+wb.create_sheet("yaw")
+s1 = wb['yaw']            # 開啟工作表
+
 
 while (True):
 
@@ -157,6 +166,41 @@ while (True):
                         ]), -handFaceRow)
 
 
+
+            cv2KeyEvent = cv2.waitKey(1)
+            if (cv2KeyEvent == ord('s') and not standardRelativeHandLandmark.any()):
+                standardRelativeHandLandmark = relativeLandmarkPos
+                s1.cell(1,1).value = "standerd"
+                s1.cell(1,2).value = "yaw"
+                s1.cell(1,3).value = "pitch"
+                s1.cell(1,4).value = "row"
+                for i in range(21):
+                    s1.cell(1,5+i).value = "landmark " + str(i)
+                
+            if (cv2KeyEvent == ord('r') and standardRelativeHandLandmark.any()):
+                print(relativeLandmarkPos - standardRelativeHandLandmark)
+
+
+
+            s1['A1'].value = 'apple'     # 儲存格 A1 內容為 apple
+            s1['A2'].value = 'orange'    # 儲存格 A2 內容為 orange
+            s1['A3'].value = 'banana'    # 儲存格 A3 內容為 banana
+            s1.cell(1,2).value = 100     # 儲存格 B1 內容 ( row=1, column=2 ) 為 100
+            s1.cell(2,2).value = 200     # 儲存格 B2 內容 ( row=2, column=2 ) 為 200
+            s1.cell(3,2).value = 300     # 儲存格 B3 內容 ( row=3, column=2 ) 為 300
+
+
+
+
+
+
+
+
+
+
+
+
+
             # print(handFaceVector)
             print(handFaceYaw, handFacePitch, handFaceRow)
 
@@ -178,3 +222,5 @@ while (True):
 
     if (cv2KeyEvent == 27):
         break
+
+wb.save('yaw.xlsx')
