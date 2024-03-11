@@ -103,32 +103,20 @@ while (True):
 
             vector_a = handLandmark[13] - handLandmark[0]
             vector_b = handLandmark[13] - handLandmark[5]
-            vector_a[1] *= -1
-            vector_b[1] *= -1
             handFaceVector = tools.externalProduct(vector_a, vector_b)
-            handFaceVector = 0 - handFaceVector
+            handFaceVector = handFaceVector
 
             handFaceYaw = tools.getDegree(
-                numpy.array([handFaceVector[2], handFaceVector[0]]),
-                numpy.array([-1, 0]))
+                numpy.array([handFaceVector[0], handFaceVector[2]]),
+                numpy.array([ 0, -1]))
             if (handFaceVector[0] < 0):
                 handFaceYaw = -handFaceYaw
 
             handFacePitch = tools.getDegree(
-                numpy.array([handFaceVector[2], handFaceVector[1]]),
-                numpy.array([-1, 0]))
-            if (handFacePitch > 90):
-                handFacePitch -= 180
-            if (handFaceVector[1] > 0):
+                numpy.array([handFaceVector[0],handFaceVector[1],handFaceVector[2]]),
+                numpy.array([handFaceVector[0],               0 ,handFaceVector[2]]))
+            if (handFaceVector[1] < 0):
                 handFacePitch = -handFacePitch
-
-            handFaceRow = tools.getDegree(
-                numpy.array([vector_a[0], vector_a[1]]), numpy.array([0, 1]))
-            if (vector_a[0] > 0):
-                handFaceRow = -handFaceRow
-
-            # print(handFaceVector)
-            # print(handFaceYaw, handFacePitch, handFaceRow)
 
             handSize = tools.getVectorLength(handLandmark[5] -
                                              handLandmark[17])
@@ -152,23 +140,25 @@ while (True):
                             relativeLandmarkPos[i][2]
                         ]), -handFacePitch)
 
-            handFacePointNew = relativeLandmarkPos[13] - relativeLandmarkPos[0]
-            handFaceRowNew = tools.getDegree(
-                numpy.array([handFacePointNew[0], handFacePointNew[1]]),
-                numpy.array([0, 1]))
-            if (handFacePointNew[0] > 0):
-                handFaceRowNew = -handFaceRowNew
-            print(relativeLandmarkPos[13], relativeLandmarkPos[0])
+            handFaceRowVector = relativeLandmarkPos[13]-relativeLandmarkPos[0]
+            handFaceRow = tools.getDegree(handFaceRowVector,numpy.array([0,-1,0]))
+            if(handFaceRowVector[0]<0):
+                handFaceRow = -handFaceRow
 
-            # for i in range(21):
-            #     relativeLandmarkPos[i][0], relativeLandmarkPos[i][
-            #         1] = tools.rotateVector(
-            #             numpy.array([
-            #                 relativeLandmarkPos[i][0],
-            #                 relativeLandmarkPos[i][1]
-            #             ]), handFaceRowNew)
 
-                # idk why not -handFaceRow
+            # print(relativeLandmarkPos[13], relativeLandmarkPos[0])
+
+            for i in range(21):
+                relativeLandmarkPos[i][0], relativeLandmarkPos[i][
+                    1] = tools.rotateVector(
+                        numpy.array([
+                            relativeLandmarkPos[i][0],
+                            relativeLandmarkPos[i][1]
+                        ]), -handFaceRow)
+
+
+            # print(handFaceVector)
+            print(handFaceYaw, handFacePitch, handFaceRow)
 
             # print(relativeLandmarkPos[4])
             hand3D.draw(relativeLandmarkPos)
