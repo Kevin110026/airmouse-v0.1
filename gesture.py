@@ -1,4 +1,4 @@
-from tools import *
+import tools
 import numpy
 
 
@@ -57,7 +57,7 @@ def analize(landmark: numpy.ndarray, returnDegree = False) -> numpy.ndarray:
 
     for i in range(5):
         fingersDegree[i] = int(fingersDegree[i])
-    print(fingersDegree[0])
+    # print(fingersDegree[0])
 
     if(returnDegree):
         return fingersDegree

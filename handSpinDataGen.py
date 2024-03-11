@@ -5,15 +5,13 @@ print("loading dictionary")
 
 import cv2
 import mediapipe as mp
-import matplotlib
 import numpy
-import copy
-import matplotlib.pyplot as plt
 import openpyxl
 
 import fps
 import tools
 import draw3DHand
+import gesture
 
 MAX_FPS = 60
 CAM_NUM = 0
@@ -49,7 +47,7 @@ mpDraw = mp.solutions.drawing_utils
 print("took " + str(time.perf_counter() - runTimeRecorder) + " sec")
 runTimeRecorder = time.perf_counter()
 
-hancLandmarkConnection = numpy.array([
+handLandmarkConnection = numpy.array([
     [0, 1],
     [1, 2],
     [2, 3],
@@ -76,15 +74,14 @@ hancLandmarkConnection = numpy.array([
 hand3D = draw3DHand.handDrawer3D()
 
 FPS = fps.fps()
+standardRelativeLandmarkPos = numpy.zeros((21, 3))
+standardFingerdegrees = numpy.zeros((5))
 startRecord = False
-standardRelativeHandLandmark = numpy.zeros((21,3))
-
-
+recordRow = 8
 
 wb = openpyxl.Workbook()
-wb.create_sheet("yaw")
-s1 = wb['yaw']            # 開啟工作表
-
+wb.create_sheet("row")
+s1 = wb['row']  # 開啟工作表
 
 while (True):
 
@@ -117,13 +114,14 @@ while (True):
 
             handFaceYaw = tools.getDegree(
                 numpy.array([handFaceVector[0], handFaceVector[2]]),
-                numpy.array([ 0, -1]))
+                numpy.array([0, -1]))
             if (handFaceVector[0] < 0):
                 handFaceYaw = -handFaceYaw
 
             handFacePitch = tools.getDegree(
-                numpy.array([handFaceVector[0],handFaceVector[1],handFaceVector[2]]),
-                numpy.array([handFaceVector[0],               0 ,handFaceVector[2]]))
+                numpy.array(
+                    [handFaceVector[0], handFaceVector[1], handFaceVector[2]]),
+                numpy.array([handFaceVector[0], 0, handFaceVector[2]]))
             if (handFaceVector[1] < 0):
                 handFacePitch = -handFacePitch
 
@@ -149,11 +147,11 @@ while (True):
                             relativeLandmarkPos[i][2]
                         ]), -handFacePitch)
 
-            handFaceRowVector = relativeLandmarkPos[13]-relativeLandmarkPos[0]
-            handFaceRow = tools.getDegree(handFaceRowVector,numpy.array([0,-1,0]))
-            if(handFaceRowVector[0]<0):
+            handFaceRowVector = relativeLandmarkPos[13] - relativeLandmarkPos[0]
+            handFaceRow = tools.getDegree(handFaceRowVector,
+                                          numpy.array([0, -1, 0]))
+            if (handFaceRowVector[0] < 0):
                 handFaceRow = -handFaceRow
-
 
             # print(relativeLandmarkPos[13], relativeLandmarkPos[0])
 
@@ -165,47 +163,96 @@ while (True):
                             relativeLandmarkPos[i][1]
                         ]), -handFaceRow)
 
-
+            fingerdegrees = gesture.analize(relativeLandmarkPos,
+                                            returnDegree=True)
 
             cv2KeyEvent = cv2.waitKey(1)
-            if (cv2KeyEvent == ord('s') and not standardRelativeHandLandmark.any()):
-                standardRelativeHandLandmark = relativeLandmarkPos
-                s1.cell(1,1).value = "standerd"
-                s1.cell(1,2).value = "yaw"
-                s1.cell(1,3).value = "pitch"
-                s1.cell(1,4).value = "row"
+            if (cv2KeyEvent == ord('s') and not startRecord):
+
+                print("start record!!!")
+                standardRelativeLandmarkPos = relativeLandmarkPos.copy()
+                standardFingerdegrees = fingerdegrees.copy()
+
+                s1.cell(1, 1).value = "standerd"
+
+                s1.cell(1, 3).value = "yaw"
+                s1.cell(2, 3).value = handFaceYaw
+                s1.cell(1, 4).value = "pitch"
+                s1.cell(2, 4).value = handFacePitch
+                s1.cell(1, 5).value = "row"
+                s1.cell(2, 5).value = handFaceRow
+
+                s1.cell(1, 7).value = "thumb"
+                s1.cell(2, 7).value = fingerdegrees[0]
+                s1.cell(1, 8).value = "fore"
+                s1.cell(2, 8).value = fingerdegrees[1]
+                s1.cell(1, 9).value = "middle"
+                s1.cell(2, 9).value = fingerdegrees[2]
+                s1.cell(1, 10).value = "ring"
+                s1.cell(2, 10).value = fingerdegrees[3]
+                s1.cell(1, 11).value = "little"
+                s1.cell(2, 11).value = fingerdegrees[4]
+
+                s1.cell(1, 13).value = "landmark"
+                s1.cell(2, 13).value = "x"
+                s1.cell(3, 13).value = "y"
+                s1.cell(4, 13).value = "z"
                 for i in range(21):
-                    s1.cell(1,5+i).value = "landmark " + str(i)
-                
-            if (cv2KeyEvent == ord('r') and standardRelativeHandLandmark.any()):
-                print(relativeLandmarkPos - standardRelativeHandLandmark)
+                    s1.cell(1, 14 + i).value = str(i)
+                    s1.cell(2, 14 + i).value = relativeLandmarkPos[i][0]
+                    s1.cell(3, 14 + i).value = relativeLandmarkPos[i][1]
+                    s1.cell(4, 14 + i).value = relativeLandmarkPos[i][2]
 
+                s1.cell(7, 1).value = "others"
 
+                s1.cell(7, 3).value = "yaw"
+                s1.cell(7, 4).value = "pitch"
+                s1.cell(7, 5).value = "row"
 
-            s1['A1'].value = 'apple'     # 儲存格 A1 內容為 apple
-            s1['A2'].value = 'orange'    # 儲存格 A2 內容為 orange
-            s1['A3'].value = 'banana'    # 儲存格 A3 內容為 banana
-            s1.cell(1,2).value = 100     # 儲存格 B1 內容 ( row=1, column=2 ) 為 100
-            s1.cell(2,2).value = 200     # 儲存格 B2 內容 ( row=2, column=2 ) 為 200
-            s1.cell(3,2).value = 300     # 儲存格 B3 內容 ( row=3, column=2 ) 為 300
+                s1.cell(7, 7).value = "thumb"
+                s1.cell(7, 8).value = "fore"
+                s1.cell(7, 9).value = "middle"
+                s1.cell(7, 10).value = "ring"
+                s1.cell(7, 11).value = "little"
 
+                s1.cell(7, 13).value = "landmark"
+                s1.cell(8, 13).value = "dist"
+                for i in range(21):
+                    s1.cell(7, 14 + i).value = str(i)
 
+                startRecord = True
 
+            if (cv2KeyEvent == ord('r') and startRecord):
+                print("recording!!!")
+                s1.cell(recordRow, 3).value = handFaceYaw
+                s1.cell(recordRow, 4).value = handFacePitch
+                s1.cell(recordRow, 5).value = handFaceRow
 
+                s1.cell(recordRow,
+                        7).value = fingerdegrees[0] - standardFingerdegrees[0]
+                s1.cell(recordRow,
+                        8).value = fingerdegrees[1] - standardFingerdegrees[1]
+                s1.cell(recordRow,
+                        9).value = fingerdegrees[2] - standardFingerdegrees[2]
+                s1.cell(recordRow,
+                        10).value = fingerdegrees[3] - standardFingerdegrees[3]
+                s1.cell(recordRow,
+                        11).value = fingerdegrees[4] - standardFingerdegrees[4]
 
+                for i in range(21):
+                    s1.cell(recordRow, 14 + i).value = tools.getVectorLength(
+                        relativeLandmarkPos[i] -
+                        standardRelativeLandmarkPos[i])
 
+                recordRow += 1
 
-
-
-
-
-
-
+            if (cv2KeyEvent == ord('a') and startRecord):
+                recordRow += 1
             # print(handFaceVector)
             print(handFaceYaw, handFacePitch, handFaceRow)
 
             # print(relativeLandmarkPos[4])
-            hand3D.draw(relativeLandmarkPos)
+            # hand3D.draw(relativeLandmarkPos)
 
             for handLms in handResult.multi_hand_landmarks:
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
@@ -223,4 +270,4 @@ while (True):
     if (cv2KeyEvent == 27):
         break
 
-wb.save('yaw.xlsx')
+wb.save('dataGen/row-掌.xlsx')
