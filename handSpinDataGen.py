@@ -80,8 +80,8 @@ startRecord = False
 recordRow = 8
 
 wb = openpyxl.Workbook()
-wb.create_sheet("row")
-s1 = wb['row']  # 開啟工作表
+wb.create_sheet("roll")
+s1 = wb['roll']  # 開啟工作表
 
 while (True):
 
@@ -147,11 +147,11 @@ while (True):
                             relativeLandmarkPos[i][2]
                         ]), -handFacePitch)
 
-            handFaceRowVector = relativeLandmarkPos[13] - relativeLandmarkPos[0]
-            handFaceRow = tools.getDegree(handFaceRowVector,
+            handFaceRollVector = relativeLandmarkPos[13] - relativeLandmarkPos[0]
+            handFaceRoll = tools.getDegree(handFaceRollVector,
                                           numpy.array([0, -1, 0]))
-            if (handFaceRowVector[0] < 0):
-                handFaceRow = -handFaceRow
+            if (handFaceRollVector[0] < 0):
+                handFaceRoll = -handFaceRoll
 
             # print(relativeLandmarkPos[13], relativeLandmarkPos[0])
 
@@ -161,7 +161,7 @@ while (True):
                         numpy.array([
                             relativeLandmarkPos[i][0],
                             relativeLandmarkPos[i][1]
-                        ]), -handFaceRow)
+                        ]), -handFaceRoll)
 
             fingerdegrees = gesture.analize(relativeLandmarkPos,
                                             returnDegree=True)
@@ -179,46 +179,50 @@ while (True):
                 s1.cell(2, 3).value = handFaceYaw
                 s1.cell(1, 4).value = "pitch"
                 s1.cell(2, 4).value = handFacePitch
-                s1.cell(1, 5).value = "row"
-                s1.cell(2, 5).value = handFaceRow
+                s1.cell(1, 5).value = "roll"
+                s1.cell(2, 5).value = handFaceRoll
 
-                s1.cell(1, 7).value = "thumb"
-                s1.cell(2, 7).value = fingerdegrees[0]
-                s1.cell(1, 8).value = "fore"
-                s1.cell(2, 8).value = fingerdegrees[1]
-                s1.cell(1, 9).value = "middle"
-                s1.cell(2, 9).value = fingerdegrees[2]
-                s1.cell(1, 10).value = "ring"
-                s1.cell(2, 10).value = fingerdegrees[3]
-                s1.cell(1, 11).value = "little"
-                s1.cell(2, 11).value = fingerdegrees[4]
+                s1.cell(1, 7).value = "fingers"
+                s1.cell(2, 7).value = "original degrees"
+                s1.cell(1, 8).value = "thumb"
+                s1.cell(2, 8).value = fingerdegrees[0]
+                s1.cell(1, 9).value = "fore"
+                s1.cell(2, 9).value = fingerdegrees[1]
+                s1.cell(1, 10).value = "middle"
+                s1.cell(2, 10).value = fingerdegrees[2]
+                s1.cell(1, 11).value = "ring"
+                s1.cell(2, 11).value = fingerdegrees[3]
+                s1.cell(1, 12).value = "little"
+                s1.cell(2, 12).value = fingerdegrees[4]
 
-                s1.cell(1, 13).value = "landmark"
-                s1.cell(2, 13).value = "x"
-                s1.cell(3, 13).value = "y"
-                s1.cell(4, 13).value = "z"
+                s1.cell(1, 14).value = "landmark"
+                s1.cell(2, 14).value = "x"
+                s1.cell(3, 14).value = "y"
+                s1.cell(4, 14).value = "z"
                 for i in range(21):
-                    s1.cell(1, 14 + i).value = str(i)
-                    s1.cell(2, 14 + i).value = relativeLandmarkPos[i][0]
-                    s1.cell(3, 14 + i).value = relativeLandmarkPos[i][1]
-                    s1.cell(4, 14 + i).value = relativeLandmarkPos[i][2]
+                    s1.cell(1, 15 + i).value = str(i)
+                    s1.cell(2, 15 + i).value = relativeLandmarkPos[i][0]
+                    s1.cell(3, 15 + i).value = relativeLandmarkPos[i][1]
+                    s1.cell(4, 15 + i).value = relativeLandmarkPos[i][2]
 
                 s1.cell(7, 1).value = "others"
 
                 s1.cell(7, 3).value = "yaw"
                 s1.cell(7, 4).value = "pitch"
-                s1.cell(7, 5).value = "row"
+                s1.cell(7, 5).value = "roll"
 
-                s1.cell(7, 7).value = "thumb"
-                s1.cell(7, 8).value = "fore"
-                s1.cell(7, 9).value = "middle"
-                s1.cell(7, 10).value = "ring"
-                s1.cell(7, 11).value = "little"
+                s1.cell(7, 7).value = "fingers"
+                s1.cell(8, 7).value = "diff"
+                s1.cell(7, 8).value = "thumb"
+                s1.cell(7, 9).value = "fore"
+                s1.cell(7, 10).value = "middle"
+                s1.cell(7, 11).value = "ring"
+                s1.cell(7, 12).value = "little"
 
-                s1.cell(7, 13).value = "landmark"
-                s1.cell(8, 13).value = "dist"
+                s1.cell(7, 14).value = "landmark"
+                s1.cell(8, 15).value = "dist"
                 for i in range(21):
-                    s1.cell(7, 14 + i).value = str(i)
+                    s1.cell(7, 15 + i).value = str(i)
 
                 startRecord = True
 
@@ -226,21 +230,21 @@ while (True):
                 print("recording!!!")
                 s1.cell(recordRow, 3).value = handFaceYaw
                 s1.cell(recordRow, 4).value = handFacePitch
-                s1.cell(recordRow, 5).value = handFaceRow
+                s1.cell(recordRow, 5).value = handFaceRoll
 
                 s1.cell(recordRow,
-                        7).value = fingerdegrees[0] - standardFingerdegrees[0]
+                        8).value = fingerdegrees[0] - standardFingerdegrees[0]
                 s1.cell(recordRow,
-                        8).value = fingerdegrees[1] - standardFingerdegrees[1]
+                        9).value = fingerdegrees[1] - standardFingerdegrees[1]
                 s1.cell(recordRow,
-                        9).value = fingerdegrees[2] - standardFingerdegrees[2]
+                        10).value = fingerdegrees[2] - standardFingerdegrees[2]
                 s1.cell(recordRow,
-                        10).value = fingerdegrees[3] - standardFingerdegrees[3]
+                        11).value = fingerdegrees[3] - standardFingerdegrees[3]
                 s1.cell(recordRow,
-                        11).value = fingerdegrees[4] - standardFingerdegrees[4]
+                        12).value = fingerdegrees[4] - standardFingerdegrees[4]
 
                 for i in range(21):
-                    s1.cell(recordRow, 14 + i).value = tools.getVectorLength(
+                    s1.cell(recordRow, 15 + i).value = tools.getVectorLength(
                         relativeLandmarkPos[i] -
                         standardRelativeLandmarkPos[i])
 
@@ -249,10 +253,10 @@ while (True):
             if (cv2KeyEvent == ord('a') and startRecord):
                 recordRow += 1
             # print(handFaceVector)
-            print(handFaceYaw, handFacePitch, handFaceRow)
+            print(handFaceYaw, handFacePitch, handFaceRoll)
 
             # print(relativeLandmarkPos[4])
-            # hand3D.draw(relativeLandmarkPos)
+            hand3D.draw(relativeLandmarkPos)
 
             for handLms in handResult.multi_hand_landmarks:
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
@@ -270,4 +274,4 @@ while (True):
     if (cv2KeyEvent == 27):
         break
 
-wb.save('dataGen/row-掌.xlsx')
+wb.save('dataGen/Roll-掌.xlsx')
