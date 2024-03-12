@@ -7,13 +7,14 @@ import cv2
 import mediapipe as mp
 import numpy
 import copy
-from fps import *
-from gesture import *
-from mouseControl import *
-from smoothHand import *
-from tools import *
 
-mouseControl = control()
+import fps
+import gesture
+import mouseControl
+import smoothHand
+import tools
+
+mouseControl = mouseControl.control()
 handSmoother = smoothHand(smooth=30)
 handSizeSmoother = smoothHand(smooth=30)
 MAX_FPS = 60
@@ -229,7 +230,7 @@ while True:
                         allGestureLandmarks[i][j][
                             2] = allLandmarks[i][j][2] * (imgWidth / imgSize)
 
-                    allGestures[i] = analize(allGestureLandmarks[i])
+                    allGestures[i] = gesture.analize(allGestureLandmarks[i])
                     if ((allGestures[i] == numpy.array([1, 0, 0, 0,
                                                         0])).all()):
                         handControlActivationCount[i] += 1
@@ -298,8 +299,8 @@ while True:
                     mainGestureLandmark[i][2] = mainLandmark[i][2] * (
                         imgWidth / imgSize)
 
-                curGesture = analize(mainGestureLandmark)
-                curGestureName = gesturesName(curGesture)
+                curGesture = gesture.analizeanalize(mainGestureLandmark)
+                curGestureName = gesture.gesturesName(curGesture)
 
                 # proceededImg1 = copy.deepcopy(img)
                 # handImageFilter1(proceededImg1,
@@ -357,7 +358,7 @@ while True:
                     fistExitCount = 0
 
                 if (handControlState == "Activated" and not fistExitCount):
-                    rawHandSize = getLength(mainGestureLandmark[5] -
+                    rawHandSize = tools.getLength(mainGestureLandmark[5] -
                                                   mainGestureLandmark[17])
 
                     if (curGesture[0] == 1 or curGesture[3] == 1):

@@ -252,7 +252,7 @@ while (True):
             print(handFaceYaw, handFacePitch, handFaceRow)
 
             # print(relativeLandmarkPos[4])
-            # hand3D.draw(relativeLandmarkPos)
+            hand3D.draw(relativeLandmarkPos)
 
             for handLms in handResult.multi_hand_landmarks:
                 mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
