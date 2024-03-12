@@ -15,8 +15,8 @@ import smoothHand
 import tools
 
 mouseControl = mouseControl.control()
-handSmoother = smoothHand(smooth=30)
-handSizeSmoother = smoothHand(smooth=30)
+handSmoother = smoothHand.smoothHand(smooth=30)
+handSizeSmoother = smoothHand.smoothHand(smooth=30)
 MAX_FPS = 60
 CAM_NUM = 0
 MAX_HANDS_AMOUNT = 10
@@ -57,7 +57,7 @@ mpDraw = mp.solutions.drawing_utils
 print("took " + str(time.perf_counter() - runTimeRecorder) + " sec")
 runTimeRecorder = time.perf_counter()
 
-FPS = fps()
+FPS = fps.fps()
 actionStatus = {
     "leftMouseHold": False,
     "rightClickHold": False,
@@ -299,7 +299,7 @@ while True:
                     mainGestureLandmark[i][2] = mainLandmark[i][2] * (
                         imgWidth / imgSize)
 
-                curGesture = gesture.analizeanalize(mainGestureLandmark)
+                curGesture = gesture.analize(mainGestureLandmark)
                 curGestureName = gesture.gesturesName(curGesture)
 
                 # proceededImg1 = copy.deepcopy(img)
