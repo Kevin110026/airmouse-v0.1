@@ -6,13 +6,9 @@ import copy
 import openpyxl
 
 
-
-wb = openpyxl.Workbook()
-wb.create_sheet("test1")
-s1 = wb['test1']            # 開啟工作表
-
-s1.cell(1,1).value = "name"
-s1.cell(1,2).value = "Kevin"
-
-wb.save("dataGen/testing.xlsx")
+a=numpy.array([1,2,3,4])
+b=copy.deepcopy(a[:2])
+print(b)
+a[0]=0
+print(b)
 

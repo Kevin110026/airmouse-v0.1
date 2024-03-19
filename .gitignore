@@ -7,3 +7,4 @@ build
 dist
 # handSpinDataGen.py
 test.py
+dataGen

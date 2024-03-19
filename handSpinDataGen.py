@@ -253,7 +253,8 @@ while (True):
             if (cv2KeyEvent == ord('a') and startRecord):
                 recordRow += 1
             # print(handFaceVector)
-            print(handFaceYaw, handFacePitch, handFaceRoll)
+            # print(handFaceYaw, handFacePitch, handFaceRoll)
+            print(gesture.analize(relativeLandmarkPos, True))
 
             # print(relativeLandmarkPos[4])
             hand3D.draw(relativeLandmarkPos)

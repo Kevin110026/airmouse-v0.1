@@ -1,18 +1,17 @@
+import tools
+import smoothHand
+import mouseControl
+import gesture
+import fps
+import copy
+import numpy
+import mediapipe as mp
+import cv2
 import time
 
 runTimeRecorder = time.perf_counter()
 print("loading dictionary")
 
-import cv2
-import mediapipe as mp
-import numpy
-import copy
-
-import fps
-import gesture
-import mouseControl
-import smoothHand
-import tools
 
 mouseControl = mouseControl.control()
 handSmoother = smoothHand.smoothHand(smooth=30)
@@ -178,6 +177,109 @@ def mouseExit(actionStatus=actionStatus):
     #     mouseControl.keyUp(button="ctrl")
 
 
+class handStatus:
+    # translate landmarks into smooth hand status
+
+    def __init__(self) -> None:
+        self.landmarkSmoother = numpy.ndarray(
+            (21), dtype=smoothHand.smoothHand)
+        for i in range(21):
+            self.landmarkSmoother[i] = smoothHand.smoothHand(smooth=30)
+
+        self.landmarks = numpy.zeros((21, 3))
+
+        self.fingersDegrees = numpy.zeros((5))
+        self.fingersDegrees.fill(180)
+        self.fingersTriggerStatus = numpy.zeros((5))
+
+        self.fingersReleaseDegrees = numpy.array([155, 105, 105, 105, 105])
+        self.fingersTriggerDegrees = numpy.array([150, 100, 100, 100, 100])
+
+    def set(self, handLandmarks: numpy.ndarray((21,3))) -> None:
+        # set by 1:1:1 scale 3d landmarks
+
+        for i in range(21):
+            self.landmarkSmoother[i].setPos(handLandmarks[i])
+            self.landmarks[i] = self.landmarkSmoother[i].getPos()
+
+        self.__translate()
+        self.__pushFingerDegrees()
+
+    def push(self, handLandmarks: numpy.ndarray((21,3))) -> None:
+        # push in 1:1:1 scale 3d landmarks
+
+        for i in range(21):
+            self.landmarkSmoother[i].pushPos(handLandmarks[i])
+            self.landmarks[i] = self.landmarkSmoother[i].getPos()
+
+        self.__translate()
+        self.__pushFingerDegrees()
+
+    def __translate(self) -> None:
+        self.fingersDegrees = gesture.analize(self.landmarks)
+
+    def __pushFingerDegrees(self) -> None:
+        for i in range(5):
+            if (not self.fingersTriggerStatus[i]):
+                if (self.fingersDegrees[i] <= self.fingersTriggerDegrees[i]):
+                    self.fingersTriggerStatus[i] = 1
+            else:
+                if (self.fingersDegrees[i] >= self.fingersReleaseDegrees[i]):
+                    self.fingersTriggerStatus[i] = 0
+
+    def getFingersTriggerStatus(self) -> numpy.ndarray((5)):
+        return self.fingersTriggerStatus
+
+
+class handControl:
+    # control mouse by hand status
+
+    def __init__(self) -> None:
+        self.lastMousePos = numpy.zeros((2))
+        self.curMousePos = numpy.zeros((2))
+        self.handStatus = handStatus()
+        self.actionStatus = {
+            "leftMouseHold": False,
+            "rightClickHold": False,
+            "doubleClicked": False,
+            "ctrlZooming": False,
+            "adjustingMouseSensitive": False,
+        }
+
+    def push(self, handLandmarks: numpy.ndarray((21,3))) -> None:
+        # push in 1:1:1 scale 3d landmarks
+
+        self.handStatus.push(handLandmarks=handLandmarks)
+
+        self.__control
+
+    def set(self, handLandmarks: numpy.ndarray((21,3))) -> None:
+        # set by 1:1:1 scale 3d landmarks
+
+        self.handStatus.set(handLandmarks=handLandmarks)
+        self.lastMousePos = copy.deepcopy(self.handStatus.landmarks[9][:2])
+
+        self.__control
+
+    def __control(self) -> None:
+        deltaMousePos = copy.deepcopy(self.handStatus.landmarks[9][:2]) - self.lastMousePos
+        mouseControl.addDis()
+
+        # work here later
+
+    def mouseExit(actionStatus=actionStatus) -> None:
+        if (actionStatus["leftMouseHold"]):
+            mouseControl.mouseUp(button="left")
+            actionStatus["leftMouseHold"] = False
+        if (actionStatus["rightClickHold"]):
+            mouseControl.mouseUp(button="right")
+            actionStatus["rightClickHold"] = False
+        if (actionStatus["ctrlZooming"]):
+            mouseControl.keyUp(button="ctrl")
+            actionStatus["ctrlZooming"] = False
+
+
+
 while True:
 
     curFps = FPS.get(limitFps=MAX_FPS)
@@ -234,12 +336,12 @@ while True:
                     if ((allGestures[i] == numpy.array([1, 0, 0, 0,
                                                         0])).all()):
                         handControlActivationCount[i] += 1
-                        if(handControlActivationCount[i]>10):
-                            handControlActivationCount[i]=10
+                        if (handControlActivationCount[i] > 10):
+                            handControlActivationCount[i] = 10
                     else:
                         handControlActivationCount[i] = 0
-                        if(handControlActivationCount[i]<0):
-                            handControlActivationCount[i]=0
+                        if (handControlActivationCount[i] < 0):
+                            handControlActivationCount[i] = 0
 
                 else:
                     handControlActivationCount[i] = 0
@@ -379,7 +481,7 @@ while True:
                             if (curGesture[2] and curGesture[3]):
                                 actionStatus["adjustingMouseSensitive"] = True
                                 mouseSensitiveScale += -(deltaHandPosition[1] /
-                                                        smoothHandSize) * 0.1
+                                                         smoothHandSize) * 0.1
                                 showingSensitive = numpy.zeros((200, 600, 3),
                                                                numpy.uint8)
                                 showingSensitive.fill(255)
@@ -387,14 +489,14 @@ while True:
                                             str(mouseSensitiveScale), (0, 50),
                                             cv2.FONT_HERSHEY_SIMPLEX, 2,
                                             (0, 0, 0), 2)
-                                cv2.imshow("sensitive",showingSensitive)
+                                cv2.imshow("sensitive", showingSensitive)
                             else:
                                 actionStatus["adjustingMouseSensitive"] = False
                                 try:
                                     cv2.destroyWindow("sensitive")
                                 except:
                                     pass
-                                
+
                             # zooming
                             if (curGesture[0] and curGesture[3]):
                                 if (not actionStatus["ctrlZooming"]):
@@ -408,7 +510,7 @@ while True:
                             # moving or scrolling
                             if (actionStatus["adjustingMouseSensitive"]):
                                 pass
-                            elif(curGesture[3] == 1):
+                            elif (curGesture[3] == 1):
                                 mouseControl.scroll(deltaMousePos[1])
                                 mouseControl.hscroll(deltaMousePos[0])
                             else:
