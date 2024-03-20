@@ -14,7 +14,7 @@ print("loading dictionary")
 
 
 mouseControl = mouseControl.control()
-handSmoother = smoothHand.smoothHand(smooth=30)
+handPosSmoother = smoothHand.smoothHand(smooth=30)
 handSizeSmoother = smoothHand.smoothHand(smooth=30)
 MAX_FPS = 60
 CAM_NUM = 0
@@ -47,10 +47,7 @@ singleHandModel = mpHands.Hands(model_complexity=1,
                                 max_num_hands=1,
                                 min_detection_confidence=0.30,
                                 min_tracking_confidence=0.05)
-# singleHandModel = mpHands.Hands(model_complexity=1,
-#                                  max_num_hands=1,
-#                                  min_detection_confidence=0.30,
-#                                  min_tracking_confidence=0.05)
+
 mpDraw = mp.solutions.drawing_utils
 
 print("took " + str(time.perf_counter() - runTimeRecorder) + " sec")
@@ -76,55 +73,30 @@ fistExitCount = 0
 lastMouseStatus = 0
 
 
-def handImageFilter1(img, rectangle: numpy.ndarray, boxSizeScale=1.4) -> None:
-    imgWidth = img.shape[1]
-    imgHigh = img.shape[0]
-    x1 = rectangle.min(0)[0]
-    y1 = rectangle.min(0)[1]
-    x2 = rectangle.max(0)[0]
-    y2 = rectangle.max(0)[1]
-    xc = (x1 + x2) / 2
-    yc = (y1 + y2) / 2
-    x1 = (x1 - xc) * boxSizeScale + xc
-    x2 = (x2 - xc) * boxSizeScale + xc
-    y1 = (y1 - yc) * boxSizeScale + yc
-    y2 = (y2 - yc) * boxSizeScale + yc
-    x1 = max(0, int(x1))
-    x2 = min(imgWidth, int(x2) + 1)
-    y1 = max(0, int(y1))
-    y2 = min(imgHigh, int(y2) + 1)
-    tmpImg = copy.deepcopy(img)
-    cv2.rectangle(
-        img=img,
-        pt1=(0, 0),
-        pt2=(imgWidth - 1, imgHigh - 1),
-        color=(0, 255, 0),
-        thickness=-1,
-    )
-    img[y1:y2, x1:x2] = tmpImg[y1:y2, x1:x2]
+def mpLandmarks2ndarray(landmarks, correctScale=True, imgWidth=None, imgHigh=None):
+    result = numpy.zeros((21, 3))
 
+    if(correctScale and not (imgHigh and imgWidth)):
+        raise Exception("input is not complete")
+        return None
 
-def handImageFilter2(img, rectangle: numpy.ndarray):
-    imgWidth = img.shape[1]
-    imgHigh = img.shape[0]
-    x1 = rectangle.min(0)[0]
-    y1 = rectangle.min(0)[1]
-    x2 = rectangle.max(0)[0]
-    y2 = rectangle.max(0)[1]
-    xc = (x1 + x2) / 2
-    yc = (y1 + y2) / 2
-    x1 = (x1 - xc) * 1.2 + xc
-    x2 = (x2 - xc) * 1.2 + xc
-    y1 = (y1 - yc) * 1.2 + yc
-    y2 = (y2 - yc) * 1.2 + yc
-    x1 = max(0, int(x1))
-    x2 = min(imgWidth, int(x2) + 1)
-    y1 = max(0, int(y1))
-    y2 = min(imgHigh, int(y2) + 1)
-    tmpImg = copy.deepcopy(img)
-    img = cv2.blur(img, (25, 25))
-    img[y1:y2, x1:x2] = tmpImg[y1:y2, x1:x2]
-    return img
+    try:
+        for i in range(21):
+            result[i][0] = landmarks[i].x
+            result[i][1] = landmarks[i].y
+            result[i][2] = landmarks[i].z
+        
+        if(correctScale):
+            imgSize = (imgWidth+imgHigh)/2
+            for i in range(21):
+                result[i][0] = landmarks[i].x * imgWidth/imgSize
+                result[i][1] = landmarks[i].y * imgHigh/imgSize
+                result[i][2] = landmarks[i].z * imgWidth/imgSize
+
+    except:
+        pass
+
+    return result
 
 
 def handImageFilter3(img, landmarks: numpy.ndarray, mainLandmark):
@@ -177,58 +149,36 @@ def mouseExit(actionStatus=actionStatus):
     #     mouseControl.keyUp(button="ctrl")
 
 
-class handStatus:
+class handSmoother:
     # translate landmarks into smooth hand status
 
     def __init__(self) -> None:
         self.landmarkSmoother = numpy.ndarray(
-            (21), dtype=smoothHand.smoothHand)
+            (21), dtype=object)
         for i in range(21):
             self.landmarkSmoother[i] = smoothHand.smoothHand(smooth=30)
 
-        self.landmarks = numpy.zeros((21, 3))
 
-        self.fingersDegrees = numpy.zeros((5))
-        self.fingersDegrees.fill(180)
-        self.fingersTriggerStatus = numpy.zeros((5))
 
-        self.fingersReleaseDegrees = numpy.array([155, 105, 105, 105, 105])
-        self.fingersTriggerDegrees = numpy.array([150, 100, 100, 100, 100])
-
-    def set(self, handLandmarks: numpy.ndarray((21,3))) -> None:
+    def set(self, handLandmarks: numpy.ndarray((21, 3))) -> None:
         # set by 1:1:1 scale 3d landmarks
-
         for i in range(21):
             self.landmarkSmoother[i].setPos(handLandmarks[i])
-            self.landmarks[i] = self.landmarkSmoother[i].getPos()
 
-        self.__translate()
-        self.__pushFingerDegrees()
 
-    def push(self, handLandmarks: numpy.ndarray((21,3))) -> None:
+    def push(self, handLandmarks: numpy.ndarray((21, 3))) -> None:
         # push in 1:1:1 scale 3d landmarks
-
         for i in range(21):
             self.landmarkSmoother[i].pushPos(handLandmarks[i])
-            self.landmarks[i] = self.landmarkSmoother[i].getPos()
 
-        self.__translate()
-        self.__pushFingerDegrees()
+    
+    def get(self) -> numpy.ndarray:
+        # return smooth landmarks
+        result = numpy.zeros((21, 3))
+        for i in range(21):
+            result[i] = self.landmarkSmoother[i].getPos()
+        return result
 
-    def __translate(self) -> None:
-        self.fingersDegrees = gesture.analize(self.landmarks)
-
-    def __pushFingerDegrees(self) -> None:
-        for i in range(5):
-            if (not self.fingersTriggerStatus[i]):
-                if (self.fingersDegrees[i] <= self.fingersTriggerDegrees[i]):
-                    self.fingersTriggerStatus[i] = 1
-            else:
-                if (self.fingersDegrees[i] >= self.fingersReleaseDegrees[i]):
-                    self.fingersTriggerStatus[i] = 0
-
-    def getFingersTriggerStatus(self) -> numpy.ndarray((5)):
-        return self.fingersTriggerStatus
 
 
 class handControl:
@@ -237,7 +187,6 @@ class handControl:
     def __init__(self) -> None:
         self.lastMousePos = numpy.zeros((2))
         self.curMousePos = numpy.zeros((2))
-        self.handStatus = handStatus()
         self.actionStatus = {
             "leftMouseHold": False,
             "rightClickHold": False,
@@ -246,23 +195,19 @@ class handControl:
             "adjustingMouseSensitive": False,
         }
 
-    def push(self, handLandmarks: numpy.ndarray((21,3))) -> None:
+    def push(self, handLandmarks: numpy.ndarray((21, 3))) -> None:
         # push in 1:1:1 scale 3d landmarks
-
-        self.handStatus.push(handLandmarks=handLandmarks)
 
         self.__control
 
-    def set(self, handLandmarks: numpy.ndarray((21,3))) -> None:
+    def set(self, handLandmarks: numpy.ndarray((21, 3))) -> None:
         # set by 1:1:1 scale 3d landmarks
 
-        self.handStatus.set(handLandmarks=handLandmarks)
-        self.lastMousePos = copy.deepcopy(self.handStatus.landmarks[9][:2])
 
         self.__control
 
     def __control(self) -> None:
-        deltaMousePos = copy.deepcopy(self.handStatus.landmarks[9][:2]) - self.lastMousePos
+
         mouseControl.addDis()
 
         # work here later
@@ -279,6 +224,7 @@ class handControl:
             actionStatus["ctrlZooming"] = False
 
 
+controlHandSmoother = handSmoother()
 
 while True:
 
@@ -297,6 +243,8 @@ while True:
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         if (handControlState != "Activated"):
+            # finding the hand to control
+
             lastSmoothHandPos = None
 
             # modelProcessTimeRecorder1 = time.perf_counter()
@@ -312,27 +260,16 @@ while True:
                 allLandmarksCount = 0
 
             allLandmarks = numpy.zeros((allLandmarksCount, 21, 3))
-            allGestureLandmarks = numpy.zeros((allLandmarksCount, 21, 3))
+            allLandmarksCorrected = numpy.zeros((allLandmarksCount, 21, 3))
             allGestures = numpy.zeros((allLandmarksCount, 5))
 
             for i in range(MAX_HANDS_AMOUNT):
                 if (i < allLandmarksCount):
                     for j in range(21):
-                        allLandmarks[i][j][0] = result.multi_hand_landmarks[
-                            i].landmark[j].x
-                        allLandmarks[i][j][1] = result.multi_hand_landmarks[
-                            i].landmark[j].y
-                        allLandmarks[i][j][2] = result.multi_hand_landmarks[
-                            i].landmark[j].z
+                        allLandmarks[i] = mpLandmarks2ndarray(result.multi_hand_landmarks[i].landmark, correctScale=False)
+                        allLandmarksCorrected[i] = mpLandmarks2ndarray(result.multi_hand_landmarks[i].landmark, correctScale=True, imgWidth=imgWidth, imgHigh=imgHigh)
 
-                        allGestureLandmarks[i][j][
-                            0] = allLandmarks[i][j][0] * (imgWidth / imgSize)
-                        allGestureLandmarks[i][j][
-                            1] = allLandmarks[i][j][1] * (imgHigh / imgSize)
-                        allGestureLandmarks[i][j][
-                            2] = allLandmarks[i][j][2] * (imgWidth / imgSize)
-
-                    allGestures[i] = gesture.analize(allGestureLandmarks[i])
+                    allGestures[i] = gesture.analize(allLandmarksCorrected[i])
                     if ((allGestures[i] == numpy.array([1, 0, 0, 0,
                                                         0])).all()):
                         handControlActivationCount[i] += 1
@@ -367,6 +304,9 @@ while True:
 
                 if (resultOneHand.multi_hand_landmarks):
                     handControlState = "Activated"
+                    controlHand = resultOneHand.multi_hand_landmarks[0].landmark
+                    controlHand = mpLandmarks2ndarray(controlHand, correctScale=True, imgWidth=imgWidth, imgHigh=imgHigh)
+                    controlHandSmoother.set(controlHand)
             try:
                 for handLms in result.multi_hand_landmarks:
                     mpDraw.draw_landmarks(img, handLms,
@@ -378,71 +318,29 @@ while True:
             cv2.imshow("Searching", img)
 
         else:
+            # controlling
+            
             resultOneHand = singleHandModel.process(img)
 
             if (resultOneHand.multi_hand_landmarks):
                 mainLandmark = resultOneHand.multi_hand_landmarks[0]
 
                 mainLandmark = numpy.zeros((21, 3))
-                mainGestureLandmark = numpy.zeros((21, 3))
+                mainLandmarkCorrected = numpy.zeros((21, 3))
 
-                for i in range(21):
-                    mainLandmark[i][0] = resultOneHand.multi_hand_landmarks[
-                        0].landmark[i].x
-                    mainLandmark[i][1] = resultOneHand.multi_hand_landmarks[
-                        0].landmark[i].y
-                    mainLandmark[i][2] = resultOneHand.multi_hand_landmarks[
-                        0].landmark[i].z
+                mainLandmark = mpLandmarks2ndarray(resultOneHand.multi_hand_landmarks[0].landmark, correctScale=False)
+                mainLandmarkCorrected = mpLandmarks2ndarray(resultOneHand.multi_hand_landmarks[0].landmark, correctScale=True, imgWidth=imgWidth, imgHigh=imgHigh)
+                controlHandSmoother.push(mainLandmarkCorrected)
+                smoothControlHand = controlHandSmoother.get()
 
-                    mainGestureLandmark[i][0] = mainLandmark[i][0] * (
-                        imgWidth / imgSize)
-                    mainGestureLandmark[i][1] = mainLandmark[i][1] * (imgHigh /
-                                                                      imgSize)
-                    mainGestureLandmark[i][2] = mainLandmark[i][2] * (
-                        imgWidth / imgSize)
-
-                curGesture = gesture.analize(mainGestureLandmark)
+                curGesture = gesture.analize(smoothControlHand)
                 curGestureName = gesture.gesturesName(curGesture)
-
-                # proceededImg1 = copy.deepcopy(img)
-                # handImageFilter1(proceededImg1,
-                #                  numpy.array(
-                #                      (gestureLandMark.min(axis=0)[:2] * imgSize,
-                #                       gestureLandMark.max(axis=0)[:2] * imgSize)),
-                #                  boxSizeScale=1.4)
-                # result2 = singleHandModel2.process(proceededImg1)
-                # if (result2.multi_hand_landmarks):
-                #     for handLms in result2.multi_hand_landmarks:
-                #         mpDraw.draw_landmarks(proceededImg1, handLms,
-                #                               mpHands.HAND_CONNECTIONS)
-                #     cv2.putText(
-                #         proceededImg1, "scroe: " +
-                #         str(result2.multi_handedness[0].classification[0].score),
-                #         (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2)
-
-                # cv2.imshow("proceeded img1", proceededImg1)
-
-                # proceededImg2 = copy.deepcopy(img)
-                # handImageFilter3(proceededImg2,
-                #                  landmarks=allLandmarks,
-                #                  mainLandmark=0)
-                # result3 = singleHandModel3.process(proceededImg2)
-                # if (result3.multi_hand_landmarks):
-                #     for handLms in result3.multi_hand_landmarks:
-                #         mpDraw.draw_landmarks(proceededImg2, handLms,
-                #                               mpHands.HAND_CONNECTIONS)
-                #     cv2.putText(
-                #         proceededImg2, "scroe: " +
-                #         str(result3.multi_handedness[0].classification[0].score),
-                #         (0, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 255, 255), 2)
-
-                # cv2.imshow("proceeded img2", proceededImg2)
 
                 # print(curGesture)
                 # print(curGestureName)
 
-                handX = mainGestureLandmark[9][0]
-                handY = mainGestureLandmark[9][1]
+                handX = mainLandmarkCorrected[9][0]
+                handY = mainLandmarkCorrected[9][1]
 
                 rawHandPos = numpy.array((1 - handX, handY))
 
@@ -460,13 +358,13 @@ while True:
                     fistExitCount = 0
 
                 if (handControlState == "Activated" and not fistExitCount):
-                    rawHandSize = tools.getLength(mainGestureLandmark[5] -
-                                                  mainGestureLandmark[17])
+                    rawHandSize = tools.getLength(smoothControlHand[5] -
+                                                  smoothControlHand[17])
 
                     if (curGesture[0] == 1 or curGesture[3] == 1):
-                        handSmoother.pushPos(rawHandPos)
+                        handPosSmoother.pushPos(rawHandPos)
                         handSizeSmoother.pushPos(numpy.array([rawHandSize, 0]))
-                        smoothHandPos = handSmoother.getPos()
+                        smoothHandPos = handPosSmoother.getPos()[:2]
                         smoothHandSize = handSizeSmoother.getPos()[0]
                         if (type(lastSmoothHandPos) != type(None)):
                             deltaHandPosition = smoothHandPos - lastSmoothHandPos
@@ -516,10 +414,10 @@ while True:
                             else:
                                 mouseControl.addDis(deltaMousePos)
                         else:
-                            handSmoother.setPos(rawHandPos)
+                            handPosSmoother.setPos(rawHandPos)
                             handSizeSmoother.setPos(
                                 numpy.array([rawHandSize, 0]))
-                            smoothHandPos = handSmoother.getPos()
+                            smoothHandPos = handPosSmoother.getPos()[0:2]
                             smoothHandSize = handSizeSmoother.getPos()[0]
 
                         lastSmoothHandPos = smoothHandPos
@@ -567,26 +465,7 @@ while True:
                 for handLms in resultOneHand.multi_hand_landmarks:
                     mpDraw.draw_landmarks(img, handLms,
                                           mpHands.HAND_CONNECTIONS)
-                    # for i, lm in enumerate(handLms.landmark):
-                    #     print(i, lm.x, lm.y)
 
-                # for i in range(len(result.multi_handedness)):
-                #     x = result.multi_hand_landmarks[i].landmark[9].x * imgWidth
-                #     y = result.multi_hand_landmarks[i].landmark[9].y * imgHigh
-                #     x = int(x)
-                #     y = int(y)
-                #     cv2.putText(
-                #         img, str(result.multi_handedness[i].classification[0].index),
-                #         (x, y), cv2.FONT_HERSHEY_SIMPLEX, 3, (0, 0, 0), 2)
-
-                # for i in range(21):
-                #     x = mainLandmark.landmark[i].x * imgWidth
-                #     y = mainLandmark.landmark[i].y * imgHigh
-                #     z = mainLandmark.landmark[i].z
-                #     x = int(x)
-                #     y = int(y)
-                #     cv2.putText(img, str(i), (x, y), cv2.FONT_HERSHEY_SIMPLEX,
-                #                 1 - z * 10, (255, 0, 0), 2)
                 cv2.putText(img, "fps: " + str(int(curFps)), (0, 50),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2)
 

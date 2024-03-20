@@ -7,16 +7,21 @@ class smoothHand:
 
     def __init__(self, smooth=30) -> None:
         self.smooth = smooth
-        self.rawPosRecord = numpy.zeros((self.smooth, 2))
+        self.rawPosRecord = numpy.zeros((self.smooth, 3))
 
     def setPos(self, Pos: numpy.ndarray) -> None:
+        Pos = Pos.copy()
+        Pos.resize((3))
+        self.rawPosRecord[0] = Pos
         for i in range(self.smooth):
-            self.rawPosRecord[i] = Pos.copy()
+            self.rawPosRecord[i] = Pos
 
     def pushPos(self, Pos: numpy.ndarray) -> None:
         for i in range(self.smooth - 1, 0, -1):
             self.rawPosRecord[i] = self.rawPosRecord[i - 1].copy()
-        self.rawPosRecord[0] = Pos.copy()
+        Pos = Pos.copy()
+        Pos.resize((3))
+        self.rawPosRecord[0] = Pos
         self.__smoothMove()
 
     def getPos(self) -> numpy.ndarray:
