@@ -31,22 +31,25 @@ print("loading camera")
 cap = cv2.VideoCapture(CAM_NUM)
 
 if cap is None or not cap.isOpened():
-    raise Exception(
-        'Unable to access camera, please check README.md for more info')
+    raise Exception("Unable to access camera, please check README.md for more info")
 
 print("took " + str(time.perf_counter() - runTimeRecorder) + " sec")
 runTimeRecorder = time.perf_counter()
 print("loading model")
 
 mpHands = mp.solutions.hands
-multiHandModel = mpHands.Hands(model_complexity=1,
-                               max_num_hands=MAX_HANDS_AMOUNT,
-                               min_detection_confidence=0.95,
-                               min_tracking_confidence=0.05)
-singleHandModel = mpHands.Hands(model_complexity=1,
-                                max_num_hands=1,
-                                min_detection_confidence=0.30,
-                                min_tracking_confidence=0.05)
+multiHandModel = mpHands.Hands(
+    model_complexity=1,
+    max_num_hands=MAX_HANDS_AMOUNT,
+    min_detection_confidence=0.95,
+    min_tracking_confidence=0.05,
+)
+singleHandModel = mpHands.Hands(
+    model_complexity=1,
+    max_num_hands=1,
+    min_detection_confidence=0.30,
+    min_tracking_confidence=0.05,
+)
 
 mpDraw = mp.solutions.drawing_utils
 
@@ -65,7 +68,6 @@ lastSmoothHandPos = None
 
 # handControlActivationCount = 0
 handControlActivationCount = numpy.zeros((MAX_HANDS_AMOUNT))
-handControlActivated = False
 handControlState = "None"
 handControlMatchingTarget = None
 
@@ -76,7 +78,7 @@ lastMouseStatus = 0
 def mpLandmarks2ndarray(landmarks, correctScale=True, imgWidth=None, imgHigh=None):
     result = numpy.zeros((21, 3))
 
-    if(correctScale and not (imgHigh and imgWidth)):
+    if correctScale and not (imgHigh and imgWidth):
         raise Exception("input is not complete")
         return None
 
@@ -85,13 +87,13 @@ def mpLandmarks2ndarray(landmarks, correctScale=True, imgWidth=None, imgHigh=Non
             result[i][0] = landmarks[i].x
             result[i][1] = landmarks[i].y
             result[i][2] = landmarks[i].z
-        
-        if(correctScale):
-            imgSize = (imgWidth+imgHigh)/2
+
+        if correctScale:
+            imgSize = (imgWidth + imgHigh) / 2
             for i in range(21):
-                result[i][0] = landmarks[i].x * imgWidth/imgSize
-                result[i][1] = landmarks[i].y * imgHigh/imgSize
-                result[i][2] = landmarks[i].z * imgWidth/imgSize
+                result[i][0] = landmarks[i].x * imgWidth / imgSize
+                result[i][1] = landmarks[i].y * imgHigh / imgSize
+                result[i][2] = landmarks[i].z * imgWidth / imgSize
 
     except:
         pass
@@ -119,7 +121,7 @@ def handImageFilter3(img, landmarks: numpy.ndarray, mainLandmark):
     tmpImg = copy.deepcopy(img)
     allLandmarksCount = len(landmarks)
     for i in range(allLandmarksCount):
-        if (i == mainLandmark):
+        if i == mainLandmark:
             continue
         X1 = landmarks[i].min(0)[0] * imgWidth
         Y1 = landmarks[i].min(0)[1] * imgHigh
@@ -135,13 +137,13 @@ def handImageFilter3(img, landmarks: numpy.ndarray, mainLandmark):
 
 
 def mouseExit(actionStatus=actionStatus):
-    if (actionStatus["leftMouseHold"]):
+    if actionStatus["leftMouseHold"]:
         mouseControl.mouseUp(button="left")
         actionStatus["leftMouseHold"] = False
-    if (actionStatus["rightClickHold"]):
+    if actionStatus["rightClickHold"]:
         mouseControl.mouseUp(button="right")
         actionStatus["rightClickHold"] = False
-    if (actionStatus["ctrlZooming"]):
+    if actionStatus["ctrlZooming"]:
         mouseControl.keyUp(button="ctrl")
         actionStatus["ctrlZooming"] = False
 
@@ -153,25 +155,20 @@ class handSmoother:
     # translate landmarks into smooth hand status
 
     def __init__(self) -> None:
-        self.landmarkSmoother = numpy.ndarray(
-            (21), dtype=object)
+        self.landmarkSmoother = numpy.ndarray((21), dtype=object)
         for i in range(21):
             self.landmarkSmoother[i] = smoothHand.smoothHand(smooth=30)
 
-
-
-    def set(self, handLandmarks: numpy.ndarray((21, 3))) -> None:
+    def set(self, handLandmarks: numpy.ndarray) -> None:
         # set by 1:1:1 scale 3d landmarks
         for i in range(21):
             self.landmarkSmoother[i].setPos(handLandmarks[i])
 
-
-    def push(self, handLandmarks: numpy.ndarray((21, 3))) -> None:
+    def push(self, handLandmarks: numpy.ndarray) -> None:
         # push in 1:1:1 scale 3d landmarks
         for i in range(21):
             self.landmarkSmoother[i].pushPos(handLandmarks[i])
 
-    
     def get(self) -> numpy.ndarray:
         # return smooth landmarks
         result = numpy.zeros((21, 3))
@@ -180,51 +177,188 @@ class handSmoother:
         return result
 
 
-
 class handControl:
-    # control mouse by hand status
+    # control mouse by hand
 
     def __init__(self) -> None:
-        self.lastMousePos = numpy.zeros((2))
-        self.curMousePos = numpy.zeros((2))
+        self.lastHandPos = numpy.zeros((3))
+        self.fistExitCount = 0
+        self.controlling = False
+        self.mouseSensitiveScale = 0.2
+
         self.actionStatus = {
-            "leftMouseHold": False,
+            "leftClickHold": False,
             "rightClickHold": False,
+            "middleClickHold": False,
             "doubleClicked": False,
             "ctrlZooming": False,
             "adjustingMouseSensitive": False,
         }
+        self.__try2actTranslate = {
+            "left": "leftClickHold",
+            "right": "rightClickHold",
+            "middle": "middleClickHold",
+            "double": "doubleClicked",
+            "ctrl": "ctrlZooming",
+        }
 
-    def push(self, handLandmarks: numpy.ndarray((21, 3))) -> None:
+    def push(self, handLandmarks: numpy.ndarray) -> None:
         # push in 1:1:1 scale 3d landmarks
 
-        self.__control
+        self.__control(handLandmarks)
 
-    def set(self, handLandmarks: numpy.ndarray((21, 3))) -> None:
+    def set(self, handLandmarks: numpy.ndarray) -> None:
         # set by 1:1:1 scale 3d landmarks
+        self.lastHandPos = handLandmarks[13]
+        self.__control(handLandmarks)
 
+    def __control(self, handLandmarks: numpy.ndarray) -> None:
 
-        self.__control
+        deltaHandPos = handLandmarks[13] - self.lastHandPos
+        self.lastHandPos = handLandmarks[13]
+        handSize = tools.getLength(handLandmarks[5] - handLandmarks[17])
+        deltaMousePos = (
+            deltaHandPos * mouseControlScale * self.mouseSensitiveScale / handSize
+        )
+        deltaMousePos[0] *= -1
+        self.curFingerstrigger = gesture.analize(handLandmarks)
+        fingerTriggerToken = copy.deepcopy(self.curFingerstrigger)
 
-    def __control(self) -> None:
+        # slow mode
+        if self.curFingerstrigger[4]:
+            deltaMousePos *= 0.1
+        else:
+            pass
 
-        mouseControl.addDis()
+        # exit controll
+        if (fingerTriggerToken >= numpy.array([1, 1, 1, 1, 1])).all():
+            self.fistExitCount += 1
+            if self.fistExitCount >= 5:
+                self.mouseExit()
+                self.controlling = False
+            fingerTriggerToken -= numpy.array([1, 1, 1, 1, 1])
+            return
+        else:
+            self.fistExitCount = 0
 
-        # work here later
+        # adjusting sensitive
+        if (fingerTriggerToken >= numpy.array([0, 1, 1, 1, 0])).all():
+            self.mouseSensitiveScale += -(deltaHandPos[1] / handSize) * 0.1
+            
+            showingSensitive = numpy.zeros(
+                (200, 600, 3), numpy.uint8
+            )
+            showingSensitive.fill(255)
+            cv2.putText(
+                showingSensitive,
+                str(self.mouseSensitiveScale),
+                (0, 50),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                2,
+                (0, 0, 0),
+                2,
+            )
+            cv2.imshow("sensitive", showingSensitive)
+            fingerTriggerToken -= numpy.array([0, 1, 1, 1, 0])
+        else:
+            actionStatus["adjustingMouseSensitive"] = False
+            try:
+                cv2.destroyWindow("sensitive")
+            except:
+                pass\
 
-    def mouseExit(actionStatus=actionStatus) -> None:
-        if (actionStatus["leftMouseHold"]):
+        # middle
+        if (fingerTriggerToken >= numpy.array([0, 0, 1, 1, 0])).all():
+            self.__try2act("middle")
+            fingerTriggerToken -= numpy.array([0, 0, 1, 1, 0])
+        else:
+            self.__try2act("middle", hold=False)
+
+        # double click
+        if (fingerTriggerToken >= numpy.array([0, 1, 1, 0, 0])).all():
+            self.__try2act("double")
+            fingerTriggerToken -= numpy.array([0, 1, 1, 0, 0])
+        else:
+            self.__try2act("double", hold=False)
+
+        # zooming
+        if (fingerTriggerToken >= numpy.array([1, 0, 0, 1, 0])).all():
+            self.__try2act("ctrl")
+            mouseControl.scroll(deltaMousePos[1])
+            fingerTriggerToken -= numpy.array([1, 0, 0, 1, 0])
+        else:
+            self.__try2act("ctrl", hold=False)
+
+        # scrolling
+        if (fingerTriggerToken >= numpy.array([0, 0, 0, 1, 0])).all():
+            mouseControl.scroll(deltaMousePos[1])
+            mouseControl.hscroll(deltaMousePos[0])
+            fingerTriggerToken -= numpy.array([0, 0, 0, 1, 0])
+        else:
+            pass
+
+        # left click
+        if (fingerTriggerToken >= numpy.array([0, 1, 0, 0, 0])).all():
+            self.__try2act("left")
+            fingerTriggerToken -= numpy.array([0, 1, 0, 0, 0])
+        else:
+            self.__try2act("left", hold=False)
+
+        # right click
+        if (fingerTriggerToken >= numpy.array([0, 0, 1, 0, 0])).all():
+            self.__try2act("right")
+            fingerTriggerToken -= numpy.array([0, 0, 1, 0, 0])
+        else:
+            self.__try2act("right", hold=False)
+
+        # moving
+        if (fingerTriggerToken >= numpy.array([1, 0, 0, 0, 0])).all():
+            mouseControl.addDis(deltaMousePos[0:2])
+            fingerTriggerToken -= numpy.array([1, 0, 0, 0, 0])
+        else:
+            pass
+
+    def mouseExit(self) -> None:
+        if self.actionStatus["leftClickHold"]:
             mouseControl.mouseUp(button="left")
-            actionStatus["leftMouseHold"] = False
-        if (actionStatus["rightClickHold"]):
+            self.actionStatus["leftClickHold"] = False
+        if self.actionStatus["rightClickHold"]:
             mouseControl.mouseUp(button="right")
-            actionStatus["rightClickHold"] = False
-        if (actionStatus["ctrlZooming"]):
+            self.actionStatus["rightClickHold"] = False
+        if self.actionStatus["middleClickHold"]:
+            mouseControl.mouseUp(button="middle")
+            self.actionStatus["rightClickHold"] = False
+        if self.actionStatus["ctrlZooming"]:
             mouseControl.keyUp(button="ctrl")
-            actionStatus["ctrlZooming"] = False
+            self.actionStatus["ctrlZooming"] = False
+
+    def __try2act(self, button: str, hold=True):
+        actionStatusName = self.__try2actTranslate[button]
+
+        if hold and not self.actionStatus[actionStatusName]:
+            if button == "left" or button == "right" or button == "middle":
+                mouseControl.mouseDown(button=button)
+            elif button == "double":
+                mouseControl.mouseDoubleClick(button="left")
+            else:
+                mouseControl.keyDown(button=button)
+            self.actionStatus[actionStatusName] = True
+
+        elif not hold and self.actionStatus[actionStatusName]:
+            if button == "left" or button == "right" or button == "middle":
+                mouseControl.mouseUp(button=button)
+            elif button == "double":
+                pass
+            else:
+                mouseControl.keyUp(button=button)
+            self.actionStatus[actionStatusName] = False
 
 
 controlHandSmoother = handSmoother()
+controller = handControl()
+
+# import draw3DHand
+# handDrawer = draw3DHand.handDrawer3D()
 
 while True:
 
@@ -234,7 +368,7 @@ while True:
 
     ret, img = cap.read()
 
-    if (ret):
+    if ret:
         # cv2.imshow("img1", img)
         imgHigh = img.shape[0]
         imgWidth = img.shape[1]
@@ -242,7 +376,7 @@ while True:
 
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-        if (handControlState != "Activated"):
+        if handControlState != "Activated":
             # finding the hand to control
 
             lastSmoothHandPos = None
@@ -264,225 +398,135 @@ while True:
             allGestures = numpy.zeros((allLandmarksCount, 5))
 
             for i in range(MAX_HANDS_AMOUNT):
-                if (i < allLandmarksCount):
+                if i < allLandmarksCount:
                     for j in range(21):
-                        allLandmarks[i] = mpLandmarks2ndarray(result.multi_hand_landmarks[i].landmark, correctScale=False)
-                        allLandmarksCorrected[i] = mpLandmarks2ndarray(result.multi_hand_landmarks[i].landmark, correctScale=True, imgWidth=imgWidth, imgHigh=imgHigh)
+                        allLandmarks[i] = mpLandmarks2ndarray(
+                            result.multi_hand_landmarks[i].landmark, correctScale=False
+                        )
+                        allLandmarksCorrected[i] = mpLandmarks2ndarray(
+                            result.multi_hand_landmarks[i].landmark,
+                            correctScale=True,
+                            imgWidth=imgWidth,
+                            imgHigh=imgHigh,
+                        )
 
                     allGestures[i] = gesture.analize(allLandmarksCorrected[i])
-                    if ((allGestures[i] == numpy.array([1, 0, 0, 0,
-                                                        0])).all()):
+                    if (allGestures[i] == numpy.array([1, 0, 0, 0, 0])).all():
                         handControlActivationCount[i] += 1
-                        if (handControlActivationCount[i] > 10):
+                        if handControlActivationCount[i] > 10:
                             handControlActivationCount[i] = 10
                     else:
                         handControlActivationCount[i] = 0
-                        if (handControlActivationCount[i] < 0):
+                        if handControlActivationCount[i] < 0:
                             handControlActivationCount[i] = 0
 
                 else:
                     handControlActivationCount[i] = 0
 
-            if (handControlActivationCount.max() < 5):
+            if handControlActivationCount.max() < 5:
                 handControlState = "None"
                 handControlMatchingTarget = None
             else:
                 for i in range(allLandmarksCount):
-                    if (handControlActivationCount[i] >= 5):
+                    if handControlActivationCount[i] >= 5:
                         handControlState = "Matching"
                         handControlMatchingTarget = i
                         break
 
-            if (handControlState == "Matching"):
+            if handControlState == "Matching":
 
                 imgOneHand = copy.deepcopy(img)
-                handImageFilter3(imgOneHand, allLandmarks,
-                                 handControlMatchingTarget)
+                handImageFilter3(imgOneHand, allLandmarks, handControlMatchingTarget)
                 resultOneHand = singleHandModel.process(imgOneHand)
 
                 cv2.imshow("Matching", imgOneHand)
 
-                if (resultOneHand.multi_hand_landmarks):
+                if resultOneHand.multi_hand_landmarks:
                     handControlState = "Activated"
                     controlHand = resultOneHand.multi_hand_landmarks[0].landmark
-                    controlHand = mpLandmarks2ndarray(controlHand, correctScale=True, imgWidth=imgWidth, imgHigh=imgHigh)
+                    controlHand = mpLandmarks2ndarray(
+                        controlHand,
+                        correctScale=True,
+                        imgWidth=imgWidth,
+                        imgHigh=imgHigh,
+                    )
                     controlHandSmoother.set(controlHand)
+                    controller.controlling=True
+                    controller.set(controlHand)
             try:
                 for handLms in result.multi_hand_landmarks:
-                    mpDraw.draw_landmarks(img, handLms,
-                                          mpHands.HAND_CONNECTIONS)
+                    mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
             except:
                 pass
-            cv2.putText(img, "fps: " + str(int(curFps)), (0, 50),
-                        cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2)
+            cv2.putText(
+                img,
+                "fps: " + str(int(curFps)),
+                (0, 50),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                2,
+                (0, 0, 0),
+                2,
+            )
             cv2.imshow("Searching", img)
 
         else:
             # controlling
-            
+
             resultOneHand = singleHandModel.process(img)
 
-            if (resultOneHand.multi_hand_landmarks):
+            if resultOneHand.multi_hand_landmarks:
                 mainLandmark = resultOneHand.multi_hand_landmarks[0]
 
                 mainLandmark = numpy.zeros((21, 3))
                 mainLandmarkCorrected = numpy.zeros((21, 3))
 
-                mainLandmark = mpLandmarks2ndarray(resultOneHand.multi_hand_landmarks[0].landmark, correctScale=False)
-                mainLandmarkCorrected = mpLandmarks2ndarray(resultOneHand.multi_hand_landmarks[0].landmark, correctScale=True, imgWidth=imgWidth, imgHigh=imgHigh)
+                mainLandmark = mpLandmarks2ndarray(
+                    resultOneHand.multi_hand_landmarks[0].landmark, correctScale=False
+                )
+                mainLandmarkCorrected = mpLandmarks2ndarray(
+                    resultOneHand.multi_hand_landmarks[0].landmark,
+                    correctScale=True,
+                    imgWidth=imgWidth,
+                    imgHigh=imgHigh,
+                )
                 controlHandSmoother.push(mainLandmarkCorrected)
                 smoothControlHand = controlHandSmoother.get()
 
-                curGesture = gesture.analize(smoothControlHand)
-                curGestureName = gesture.gesturesName(curGesture)
+                # handDrawer.draw(smoothControlHand)
+                
+                controller.push(smoothControlHand)
+                if controller.controlling == False:
+                    controller.mouseExit()
+                    handControlState = "None"
+                
 
-                # print(curGesture)
-                # print(curGestureName)
-
-                handX = mainLandmarkCorrected[9][0]
-                handY = mainLandmarkCorrected[9][1]
-
-                rawHandPos = numpy.array((1 - handX, handY))
-
-                # print(handControlActivationCount, fistExitCount)
-
-                if (curGestureName == "fist"):
-                    fistExitCount += 1
-                    if (fistExitCount >= 5):
-                        lastSmoothHandPos = None
-                        handControlActivated = False
-                        handControlState = "None"
-                        mouseExit(actionStatus=actionStatus)
-                        handControlActivationCount.fill(0)
-                else:
-                    fistExitCount = 0
-
-                if (handControlState == "Activated" and not fistExitCount):
-                    rawHandSize = tools.getLength(smoothControlHand[5] -
-                                                  smoothControlHand[17])
-
-                    if (curGesture[0] == 1 or curGesture[3] == 1):
-                        handPosSmoother.pushPos(rawHandPos)
-                        handSizeSmoother.pushPos(numpy.array([rawHandSize, 0]))
-                        smoothHandPos = handPosSmoother.getPos()[:2]
-                        smoothHandSize = handSizeSmoother.getPos()[0]
-                        if (type(lastSmoothHandPos) != type(None)):
-                            deltaHandPosition = smoothHandPos - lastSmoothHandPos
-                            deltaMousePos = deltaHandPosition * mouseControlScale * (
-                                mouseSensitiveScale / smoothHandSize)
-                            deltaMousePos *= curFps / avgFps
-                            # slow mode
-                            if (curGesture[4] == 1):
-                                deltaMousePos *= 0.1
-
-                            # adjusting mouse sensitive
-                            if (curGesture[2] and curGesture[3]):
-                                actionStatus["adjustingMouseSensitive"] = True
-                                mouseSensitiveScale += -(deltaHandPosition[1] /
-                                                         smoothHandSize) * 0.1
-                                showingSensitive = numpy.zeros((200, 600, 3),
-                                                               numpy.uint8)
-                                showingSensitive.fill(255)
-                                cv2.putText(showingSensitive,
-                                            str(mouseSensitiveScale), (0, 50),
-                                            cv2.FONT_HERSHEY_SIMPLEX, 2,
-                                            (0, 0, 0), 2)
-                                cv2.imshow("sensitive", showingSensitive)
-                            else:
-                                actionStatus["adjustingMouseSensitive"] = False
-                                try:
-                                    cv2.destroyWindow("sensitive")
-                                except:
-                                    pass
-
-                            # zooming
-                            if (curGesture[0] and curGesture[3]):
-                                if (not actionStatus["ctrlZooming"]):
-                                    mouseControl.keyDown(button="ctrl")
-                                    actionStatus["ctrlZooming"] = True
-                            else:
-                                if (actionStatus["ctrlZooming"]):
-                                    mouseControl.keyUp(button="ctrl")
-                                    actionStatus["ctrlZooming"] = False
-
-                            # moving or scrolling
-                            if (actionStatus["adjustingMouseSensitive"]):
-                                pass
-                            elif (curGesture[3] == 1):
-                                mouseControl.scroll(deltaMousePos[1])
-                                mouseControl.hscroll(deltaMousePos[0])
-                            else:
-                                mouseControl.addDis(deltaMousePos)
-                        else:
-                            handPosSmoother.setPos(rawHandPos)
-                            handSizeSmoother.setPos(
-                                numpy.array([rawHandSize, 0]))
-                            smoothHandPos = handPosSmoother.getPos()[0:2]
-                            smoothHandSize = handSizeSmoother.getPos()[0]
-
-                        lastSmoothHandPos = smoothHandPos
-                    else:
-                        lastSmoothHandPos = None
-
-                    # left mouse click
-                    if (curGesture[1]):
-                        if (not actionStatus["leftMouseHold"]):
-                            mouseControl.mouseDown(button="left")
-                            actionStatus["leftMouseHold"] = True
-
-                        # left mouse double click
-                        if (curGesture[2]):
-                            if (not actionStatus["doubleClicked"]):
-                                mouseControl.mouseDoubleClick(button="left")
-                                actionStatus["doubleClicked"] = True
-
-                                # print("double clicked!")
-                        else:
-                            actionStatus["doubleClicked"] = False
-
-                    else:
-                        actionStatus["doubleClicked"] = False
-                        if (actionStatus["leftMouseHold"]):
-                            mouseControl.mouseUp(button="left")
-                            actionStatus["leftMouseHold"] = False
-
-                    # right mouse click
-                    if (curGesture[2]):
-                        if (not actionStatus["rightClickHold"]
-                                and not actionStatus["doubleClicked"]
-                                and not actionStatus["adjustingMouseSensitive"]):
-                            # print("rightClick")
-                            mouseControl.mouseDown(button="right")
-                            actionStatus["rightClickHold"] = True
-                    else:
-                        if (actionStatus["rightClickHold"]):
-                            mouseControl.mouseUp(button="right")
-                            actionStatus["rightClickHold"] = False
-
-                else:
-                    lastSmoothHandPos = None
 
                 for handLms in resultOneHand.multi_hand_landmarks:
-                    mpDraw.draw_landmarks(img, handLms,
-                                          mpHands.HAND_CONNECTIONS)
+                    mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
 
-                cv2.putText(img, "fps: " + str(int(curFps)), (0, 50),
-                            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 0), 2)
+                cv2.putText(
+                    img,
+                    "fps: " + str(int(curFps)),
+                    (0, 50),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    2,
+                    (0, 0, 0),
+                    2,
+                )
 
                 cv2.imshow("Controlling", img)
 
             else:
                 lastSmoothHandPos = None
                 handControlState = "None"
-                handControlActivated = False
-                mouseExit(actionStatus=actionStatus)
+                controller.mouseExit()
                 handControlActivationCount.fill(0)
 
     cv2KeyEvent = cv2.waitKey(1)
-    if (cv2KeyEvent == ord('q')):
+    if cv2KeyEvent == ord("q"):
         break
 
-    if (cv2KeyEvent == 27):
+    if cv2KeyEvent == 27:
         break
 
 cap.release()
