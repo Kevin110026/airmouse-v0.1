@@ -64,7 +64,7 @@ Another method: Curve forefinger first then curve middle finger to double click.
 Curve it to hold and uncurve it to release
 
 Curve then uncurve it fast to click, just like common mouse, idk why do you need double right click anyway
-## sensitive adjusting 
+## middle click 
 **middle & ring finger:**
 ![空中滑鼠 (5)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/a2851667-8b74-46e7-8575-cad973fd9fa0)
 
