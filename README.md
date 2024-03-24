@@ -64,6 +64,11 @@ Another method: Curve forefinger first then curve middle finger to double click.
 Curve it to hold and uncurve it to release
 
 Curve then uncurve it fast to click, just like common mouse, idk why do you need double right click anyway
+## sensitive adjusting 
+**middle & ring finger:**
+![空中滑鼠 (5)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/a2851667-8b74-46e7-8575-cad973fd9fa0)
+
+curve both of them to middle click
 ## mouse scrolling
 **ring finger:**
 ![空中滑鼠 (4)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/8e66b27f-0ecf-4ff5-bd3c-6037c0e5423f)
@@ -77,10 +82,10 @@ The mouse can't be dragged while scrolling
 
 curve both of them then move your hand up/down to zoom in/out the page
 ## sensitive adjusting 
-**middle & ring finger:**
-![空中滑鼠 (5)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/a2851667-8b74-46e7-8575-cad973fd9fa0)
+**forefinger & middle & ring finger:**
+(hasn't uploaded image yet)
 
-curve both of them then move your hand up/down to adjust mouse sensitive
+curve all of them then move your hand up/down to adjust mouse sensitive
 ## mouse slow mode
 **little finger:**
 ![空中滑鼠 (7)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/a72c7181-3fe1-4471-8a16-da0a778c84fd)
