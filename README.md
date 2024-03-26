@@ -37,25 +37,25 @@ the system will also quit *Controlling* mode automatically when the camera can't
 
 ## mouse activating/moving
 **thumb:**
-![空中滑鼠](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/07b40efc-ab69-474f-86ae-c3914ceeff9c)
+![空中滑鼠](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/07b40efc-ab69-474f-86ae-c3914ceeff9c | height=300)
 
 Curve the thumb to make the controller hand tracked in *Searching* & *Matching* state.
 Curve it to drag the mouse in *Controlling* state.
 ## mouse quitting
 **fist:**
-![image](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/1e715ca9-dfa9-49d7-8911-34cf3a510f77)
+![image](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/1e715ca9-dfa9-49d7-8911-34cf3a510f77 | height=300)
 
 Curve all the fingers in *Controlling* state quit controlling and go back to *Searching* state.
 ## mouse left click 
 **forefinger:**
-![空中滑鼠 (1)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/bca1da17-3192-429d-9e1d-a1b71815f14e)
+![空中滑鼠 (1)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/bca1da17-3192-429d-9e1d-a1b71815f14e | height=300)
 
 Curve it to hold and uncurve it to release
 
 Curve then uncurve it fast to click, just like common mouse
 ## mouse left double click 
 **forefinger( & middle finger):**
-![空中滑鼠 (2)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/f96d36cb-52e6-4c5d-96ba-c26d7464380e)
+![空中滑鼠 (2)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/f96d36cb-52e6-4c5d-96ba-c26d7464380e | height=300)
 
 Original method: This can be done by left clicking twice fast.
 
@@ -64,36 +64,36 @@ Another method: Curve forefinger first then curve middle finger to double click.
 `This additional rule is designed to make you still be able to double click under low fps, which is hard to be done by the original method`
 ## mouse right click
 **middle finger:**
-![空中滑鼠 (3)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/c285683e-48cd-4792-a5b3-0db260c75149)
+![空中滑鼠 (3)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/c285683e-48cd-4792-a5b3-0db260c75149 | height=300)
 
 Curve it to hold and uncurve it to release
 
 Curve then uncurve it fast to click, just like common mouse, idk why do you need double right click anyway
 ## middle click 
 **middle & ring finger:**
-![image](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/275e5869-2365-40b0-aa11-8e7c5d088359)
+![image](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/275e5869-2365-40b0-aa11-8e7c5d088359 | height=300)
 
 curve both of them to middle click
 ## mouse scrolling
 **ring finger:**
-![空中滑鼠 (4)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/8e66b27f-0ecf-4ff5-bd3c-6037c0e5423f)
+![空中滑鼠 (4)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/8e66b27f-0ecf-4ff5-bd3c-6037c0e5423f | height=300)
 
 Curve it then move your hand to scroll.
 
 The mouse can't be dragged while scrolling
 ## zooming 
 **thumb & ring finger:**
-![空中滑鼠 (6)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/ed3a037c-36f7-4045-b720-33fad647965d)
+![空中滑鼠 (6)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/ed3a037c-36f7-4045-b720-33fad647965d | height=300)
 
 curve both of them then move your hand up/down to zoom in/out the page
 ## sensitive adjusting 
 **forefinger & middle & ring finger:**
-![image](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/77a33f9c-2045-47c8-9cf8-0141ce11adee)
+![image](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/77a33f9c-2045-47c8-9cf8-0141ce11adee | height=300)
 
 curve all of them then move your hand up/down to adjust mouse sensitive
 ## mouse slow mode
 **little finger:**
-![空中滑鼠 (7)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/a72c7181-3fe1-4471-8a16-da0a778c84fd)
+![空中滑鼠 (7)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/a72c7181-3fe1-4471-8a16-da0a778c84fd | height=300)
 
 Curve little finger while doing other actions to make them slower.
 
