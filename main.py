@@ -220,7 +220,10 @@ class handControl:
         # adjusting sensitive
         if (fingerTriggerToken >= numpy.array([0, 1, 1, 1, 0])).all():
             self.actionStatus["adjustingMouseSensitive"] = True
-            self.mouseSensitiveScale += -(deltaHandPos[1] / handSize) * 0.1
+            if not self.curFingerstrigger[4]:
+                self.mouseSensitiveScale += -(deltaHandPos[1] / handSize) * 0.1
+            else:
+                self.mouseSensitiveScale += -(deltaHandPos[1] / handSize) * 0.01
 
             showingSensitive = numpy.zeros((200, 600, 3), numpy.uint8)
             showingSensitive.fill(255)
@@ -234,6 +237,7 @@ class handControl:
                 2,
             )
             cv2.imshow("sensitive", showingSensitive)
+            cv2.setWindowProperty("sensitive", cv2.WND_PROP_TOPMOST, 1)
             fingerTriggerToken -= numpy.array([0, 1, 1, 1, 0])
         else:
             self.actionStatus["adjustingMouseSensitive"] = False
