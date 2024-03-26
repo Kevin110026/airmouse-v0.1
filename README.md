@@ -26,21 +26,26 @@ Then, curve the thumb of the hand you want to use to make system recognize.
 
 After that, *Matching* window should pop up, meaning that it has found your curving hand.
 
-While Matching, hold your thumb still and move your hand a bit to make system get your hand's position more precisely. This step won't take too long.
+While Matching, hold your thumb still and wave your hand a bit to make system get your hand's position more precisely. This step won't take too long.
 
 After the system get your hand position, *Controlling* window will pop up, meaning that you can start controlling the cursor by your hand!
 
 
-curve all fingers to quit *Controlling* mode and back to *Searching*(looks like a cat's paw)
+curve all fingers to quit *Controlling* mode and back to *Searching*(looks like a cat's paw/fist).
 
-the system will also quit *Controlling* mode automatically when the camera can't detect any hand within it's range.
+the system will also quit *Controlling* mode automatically when the camera can't detect the controller hand within it's range.
 
-## mouse moving
+## mouse activating/moving
 **thumb:**
 ![空中滑鼠](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/07b40efc-ab69-474f-86ae-c3914ceeff9c)
 
-Mouse will be dragged by your hand as long as you keep the thumb curved
+Curve the thumb to make the controller hand tracked in *Searching* & *Matching* state.
+Curve it to drag the mouse in *Controlling* state.
+## mouse quitting
+**fist:**
+![image](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/1e715ca9-dfa9-49d7-8911-34cf3a510f77)
 
+Curve all the fingers in *Controlling* state quit controlling and go back to *Searching* state.
 ## mouse left click 
 **forefinger:**
 ![空中滑鼠 (1)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/bca1da17-3192-429d-9e1d-a1b71815f14e)
@@ -66,7 +71,7 @@ Curve it to hold and uncurve it to release
 Curve then uncurve it fast to click, just like common mouse, idk why do you need double right click anyway
 ## middle click 
 **middle & ring finger:**
-![空中滑鼠 (5)](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/a2851667-8b74-46e7-8575-cad973fd9fa0)
+![image](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/275e5869-2365-40b0-aa11-8e7c5d088359)
 
 curve both of them to middle click
 ## mouse scrolling
@@ -83,7 +88,7 @@ The mouse can't be dragged while scrolling
 curve both of them then move your hand up/down to zoom in/out the page
 ## sensitive adjusting 
 **forefinger & middle & ring finger:**
-(hasn't uploaded image yet)
+![image](https://github.com/Kevin110026/airmouse-v0.1/assets/131368612/77a33f9c-2045-47c8-9cf8-0141ce11adee)
 
 curve all of them then move your hand up/down to adjust mouse sensitive
 ## mouse slow mode
