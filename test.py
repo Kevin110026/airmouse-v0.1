@@ -4,8 +4,7 @@ import mouse
 import tools
 import copy
 import smoothHand
+import cv2
 
 
-a = numpy.array([1, 2, 3])
-b = a.resize((10))
-print(a)
+手把 = cv2

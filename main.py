@@ -190,7 +190,6 @@ class handControl:
         self.__control(handLandmarks)
 
     def __control(self, handLandmarks: numpy.ndarray) -> None:
-
         deltaHandPos = handLandmarks[13] - self.lastHandPos
         self.lastHandPos = handLandmarks[13]
         handSize = tools.getLength(handLandmarks[5] - handLandmarks[17])
@@ -357,7 +356,6 @@ controller = handControl()
 # handDrawer = draw3DHand.handDrawer3D()
 
 while True:
-
     curFps = FPS.get(limitFps=MAX_FPS)
     avgFps = FPS.avgFps()
     # print(round(avgFps))
@@ -430,7 +428,6 @@ while True:
                         break
 
             if handControlState == "Matching":
-
                 imgOneHand = copy.deepcopy(img)
                 handImageFilter3(imgOneHand, allLandmarks, handControlMatchingTarget)
                 resultOneHand = singleHandModel.process(imgOneHand)
@@ -515,6 +512,22 @@ while True:
                 handControlState = "None"
                 controller.mouseExit()
                 handControlActivationCount.fill(0)
+
+    if handControlState != "Matching":
+        try:
+            cv2.destroyWindow("Matching")
+        except:
+            pass
+    if handControlState != "Activated":
+        try:
+            cv2.destroyWindow("Controlling")
+        except:
+            pass
+    else:
+        try:
+            cv2.destroyWindow("Searching")
+        except:
+            pass
 
     cv2KeyEvent = cv2.waitKey(1)
     if cv2KeyEvent == ord("q"):
