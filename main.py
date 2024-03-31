@@ -305,7 +305,7 @@ class handControl:
         self.__try2act(button="middle", hold=False)
         self.__try2act(button="ctrl", hold=False)
         self.__try2act(button="double", hold=False)
-        if(self.actionStatus["adjustingMouseSensitive"]):
+        if self.actionStatus["adjustingMouseSensitive"]:
             try:
                 cv2.destroyWindow("sensitive")
             except:

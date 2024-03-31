@@ -28,7 +28,7 @@ class smoothHand:
         return self.rawPosRecord.sum(axis=0) / self.smooth
 
     def __smoothMove(self) -> None:
-        parameter = 0.95
+        parameter = 0.85
         val = 0
         center = self.getPos()
         for i in range(0, self.smooth):
