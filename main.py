@@ -162,6 +162,9 @@ class handControl:
         self.fistExitCount = 0
         self.controlling = False
         self.mouseSensitiveScale = 0.2
+        self.fingersTriggerDegrees = numpy.array(
+            [[140, 150], [100, 110], [100, 110], [100, 110], [110, 120]]
+        )
 
         self.actionStatus = {
             "leftClickHold": False,
@@ -297,18 +300,17 @@ class handControl:
             pass
 
     def mouseExit(self) -> None:
-        if self.actionStatus["leftClickHold"]:
-            mouseControl.mouseUp(button="left")
-            self.actionStatus["leftClickHold"] = False
-        if self.actionStatus["rightClickHold"]:
-            mouseControl.mouseUp(button="right")
-            self.actionStatus["rightClickHold"] = False
-        if self.actionStatus["middleClickHold"]:
-            mouseControl.mouseUp(button="middle")
-            self.actionStatus["rightClickHold"] = False
-        if self.actionStatus["ctrlZooming"]:
-            mouseControl.keyUp(button="ctrl")
-            self.actionStatus["ctrlZooming"] = False
+        self.__try2act(button="left", hold=False)
+        self.__try2act(button="right", hold=False)
+        self.__try2act(button="middle", hold=False)
+        self.__try2act(button="ctrl", hold=False)
+        self.__try2act(button="double", hold=False)
+        if(self.actionStatus["adjustingMouseSensitive"]):
+            try:
+                cv2.destroyWindow("sensitive")
+            except:
+                pass
+            self.actionStatus["adjustingMouseSensitive"] = False
 
     def __try2act(self, button: str, hold=True) -> None:
         actionStatusName = self.__try2actTranslate[button]
@@ -332,9 +334,7 @@ class handControl:
             self.actionStatus[actionStatusName] = False
 
     def __fingerTriggerSwitch(self, handLandmarks: numpy.ndarray) -> numpy.ndarray:
-        fingersTriggerDegrees = numpy.array(
-            [[140, 150], [100, 110], [100, 110], [100, 110], [110, 120]]
-        )
+        fingersTriggerDegrees = self.fingersTriggerDegrees
         fingerDegrees = gesture.analize(handLandmarks, returnDegree=True)
         result = copy.deepcopy(self.lastFingerTrigger)
         for i in range(5):
