@@ -377,8 +377,6 @@ while True:
         if handControlState != "Activated":
             # finding the hand to control
 
-            lastSmoothHandPos = None
-
             # modelProcessTimeRecorder1 = time.perf_counter()
             result = multiHandModel.process(imgRGB)
             # modelProcessTimeRecorder2 = time.perf_counter()
@@ -397,26 +395,25 @@ while True:
 
             for i in range(MAX_HANDS_AMOUNT):
                 if i < allLandmarksCount:
-                    for j in range(21):
-                        allLandmarks[i] = mpLandmarks2ndarray(
-                            result.multi_hand_landmarks[i].landmark, correctScale=False
-                        )
-                        allLandmarksCorrected[i] = mpLandmarks2ndarray(
-                            result.multi_hand_landmarks[i].landmark,
-                            correctScale=True,
-                            imgWidth=imgWidth,
-                            imgHigh=imgHigh,
-                        )
+                    allLandmarks[i] = mpLandmarks2ndarray(
+                        result.multi_hand_landmarks[i].landmark, correctScale=False
+                    )
+                    allLandmarksCorrected[i] = mpLandmarks2ndarray(
+                        result.multi_hand_landmarks[i].landmark,
+                        correctScale=True,
+                        imgWidth=imgWidth,
+                        imgHigh=imgHigh,
+                    )
 
                     allGestures[i] = gesture.analize(allLandmarksCorrected[i])
                     if (allGestures[i] == numpy.array([1, 0, 0, 0, 0])).all():
                         handControlActivationCount[i] += 1
-                        if handControlActivationCount[i] > 10:
-                            handControlActivationCount[i] = 10
                     else:
-                        handControlActivationCount[i] = 0
-                        if handControlActivationCount[i] < 0:
-                            handControlActivationCount[i] = 0
+                        handControlActivationCount[i] -= 1
+
+                    handControlActivationCount[i] = max(
+                        0, min(10, handControlActivationCount[i])
+                    )
 
                 else:
                     handControlActivationCount[i] = 0
@@ -432,7 +429,7 @@ while True:
                         break
 
             if handControlState == "Matching":
-                imgOneHand = copy.deepcopy(img)
+                imgOneHand = copy.deepcopy(imgRGB)
                 handImageFilter3(imgOneHand, allLandmarks, handControlMatchingTarget)
                 resultOneHand = singleHandModel.process(imgOneHand)
 
@@ -469,7 +466,7 @@ while True:
         else:
             # controlling
 
-            resultOneHand = singleHandModel.process(img)
+            resultOneHand = singleHandModel.process(imgRGB)
 
             if resultOneHand.multi_hand_landmarks:
                 mainLandmark = resultOneHand.multi_hand_landmarks[0]
@@ -512,7 +509,6 @@ while True:
                 cv2.imshow("Controlling", img)
 
             else:
-                lastSmoothHandPos = None
                 handControlState = "None"
                 controller.mouseExit()
                 handControlActivationCount.fill(0)
