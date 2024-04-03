@@ -530,7 +530,7 @@ while True:
 
     if handControlState != "Matching":
         try:
-            # cv2.destroyWindow("Matching")
+            cv2.destroyWindow("Matching")
             pass
         except:
             pass
