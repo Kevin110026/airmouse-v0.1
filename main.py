@@ -272,8 +272,8 @@ class handControl:
 
         # scrolling
         if (fingerTriggerToken >= numpy.array([0, 0, 0, 1, 0])).all():
-            mouseControl.scroll(deltaMousePos[1])
-            mouseControl.hscroll(deltaMousePos[0])
+            mouseControl.scroll(deltaMousePos[1] * 3)
+            mouseControl.hscroll(deltaMousePos[0] * 3)
             fingerTriggerToken -= numpy.array([0, 0, 0, 1, 0])
         else:
             pass
@@ -433,6 +433,14 @@ while True:
                 handImageFilter3(imgOneHand, allLandmarks, handControlMatchingTarget)
                 resultOneHand = singleHandModel.process(imgOneHand)
 
+                try:
+                    for handLms in resultOneHand.multi_hand_landmarks:
+                        mpDraw.draw_landmarks(
+                            imgOneHand, handLms, mpHands.HAND_CONNECTIONS
+                        )
+                except:
+                    pass
+
                 cv2.imshow("Matching", imgOneHand)
 
                 if resultOneHand.multi_hand_landmarks:
@@ -492,6 +500,13 @@ while True:
                 if controller.controlling == False:
                     controller.mouseExit()
                     handControlState = "None"
+                    # incase the model mis-track the wrong hand later which has the similiar position with the just-actively-quited one
+                    while True:
+                        resultQuitControlling = singleHandModel.process(
+                            numpy.zeros((1, 1, 3), numpy.uint8)
+                        )
+                        if not resultQuitControlling.multi_hand_landmarks:
+                            break
 
                 for handLms in resultOneHand.multi_hand_landmarks:
                     mpDraw.draw_landmarks(img, handLms, mpHands.HAND_CONNECTIONS)
@@ -515,7 +530,8 @@ while True:
 
     if handControlState != "Matching":
         try:
-            cv2.destroyWindow("Matching")
+            # cv2.destroyWindow("Matching")
+            pass
         except:
             pass
     if handControlState != "Activated":
