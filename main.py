@@ -272,8 +272,8 @@ class handControl:
 
         # scrolling
         if (fingerTriggerToken >= numpy.array([0, 0, 0, 1, 0])).all():
-            mouseControl.scroll(deltaMousePos[1] * 3)
-            mouseControl.hscroll(deltaMousePos[0] * 3)
+            mouseControl.scroll(deltaMousePos[1] * 1.2)
+            mouseControl.hscroll(deltaMousePos[0] * 1.2)
             fingerTriggerToken -= numpy.array([0, 0, 0, 1, 0])
         else:
             pass
