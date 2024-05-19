@@ -30,6 +30,7 @@ runTimeRecorder = time.perf_counter()
 print("loading camera")
 
 cap = cv2.VideoCapture(CAM_NUM)
+cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
 if cap is None or not cap.isOpened():
     raise Exception("Unable to access camera, please check README.md for more info")
